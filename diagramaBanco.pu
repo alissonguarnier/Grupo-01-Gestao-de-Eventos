@@ -1,0 +1,51 @@
+@startuml
+skinparam classAttributeIconSize 0
+class Users {
+    - id : Int
+    - username : String
+    - email : String
+    - password : Number
+    - is_active : boolean
+    - is_staff : boolean
+    - is_superuser : boolean
+}
+
+Users "1" -- "1" Perfil
+
+class Perfil {
+    - id (pk)
+    - celular
+    - tipo (Participantes, Convidado, Organizador)
+    - Eventos: list
+}
+
+class UsersEventos {
+    id (users)
+    id (eventos)
+}
+
+class Eventos {
+    - id (pk)
+    - nome
+    - discrição
+    - data-inicio
+    - data-fim
+    - local
+}
+
+Users "0...*" -- "0..*" Eventos
+
+class Atividade {
+    id (pk)
+    titulo
+    descricao
+    horario-inicio
+    horario-fim
+    tipo (workshop, palestra, oficina, outros)
+    evento-id (fk > evento)
+    responsavel-id (fk > users)
+}
+
+Eventos "1" -- "0...*" Atividade
+
+@enduml
