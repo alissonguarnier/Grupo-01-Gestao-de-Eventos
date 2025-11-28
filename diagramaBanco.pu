@@ -1,51 +1,74 @@
 @startuml
-skinparam classAttributeIconSize 0
-class Users {
-    - id : Int
-    - username : String
-    - email : String
-    - password : Number
-    - is_active : boolean
-    - is_staff : boolean
-    - is_superuser : boolean
+hide methods
+hide stereotypes
+
+skinparam class {
+    BackgroundColor #ffffff
+    BorderColor #000000
 }
 
-Users "1" -- "1" Perfil
+' ============================
+' ENTIDADES
+' ============================
 
-class Perfil {
-    - id (pk)
-    - celular
-    - tipo (Participantes, Convidado, Organizador)
-    - Eventos: list
+class USERS {
+    + id : INT <<PK>>
+    username : String
+    email : String
+    password : String
+    is_active : Boolean
+    is_staff : Boolean
+    is_superuser : Boolean
 }
 
-class UsersEventos {
-    id (users)
-    id (eventos)
+class PERFIL {
+    + id_users : INT <<PK,FK>>
+    celular : String
+    tipo : String
 }
 
-class Eventos {
-    - id (pk)
-    - nome
-    - discrição
-    - data-inicio
-    - data-fim
-    - local
+class EVENTOS {
+    + id : INT <<PK>>
+    nome : String
+    descricao : String
+    data_inicio : DateTime
+    data_fim : DateTime
+    local : String
 }
 
-Users "0...*" -- "0..*" Eventos
-
-class Atividade {
-    id (pk)
-    titulo
-    descricao
-    horario-inicio
-    horario-fim
-    tipo (workshop, palestra, oficina, outros)
-    evento-id (fk > evento)
-    responsavel-id (fk > users)
+class ATIVIDADE {
+    + id : INT <<PK>>
+    titulo : String
+    descricao : String
+    horario_inicio : Time
+    horario_fim : Time
+    tipo : String
+    evento_fk : INT <<FK>>
+    responsavel_id : INT <<FK>>
 }
 
-Eventos "1" -- "0...*" Atividade
+class USEREVENTOS {
+    + id : INT <<PK>>
+    id_users : INT <<FK>>
+    id_eventos : INT <<FK>>
+    data_inscricao : DateTime
+}
+
+' ============================
+' RELACIONAMENTOS
+' ============================
+
+' 1:1 USERS — PERFIL
+USERS "1" -- "1" PERFIL : possui
+
+' 1:N EVENTOS — ATIVIDADE
+EVENTOS "1" -- "N" ATIVIDADE : contém
+
+' 1:N USERS — ATIVIDADE (responsável)
+USERS "1" -- "N" ATIVIDADE : responsável_por
+
+' N:N USERS — EVENTOS via USEREVENTOS
+USERS "1" --- "N" USEREVENTOS
+EVENTOS "1" -- "N" USEREVENTOS
 
 @enduml
