@@ -1,4 +1,4 @@
-@startuml
+@startuml projeto_gestao_eventos
 skinparam classAttributeIconSize 0
 class Users {
     - id : Int

@@ -1,11 +1,12 @@
-from rest_framework import viewsets, permissions
-'from rest_framework.decorators import action'
-'from rest_framework.response import Response'
-'from django.contrib.auth.models import User'
-'from .models import Projeto, Equipe'
-'from .serializers import UserSerializer, ProjetoSerializer, EquipeSerializer'
-
 '''
+from rest_framework import viewsets, permissions
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from django.contrib.auth.models import User
+from .models import Projeto, Equipe
+from .serializers import UserSerializer, ProjetoSerializer, EquipeSerializer
+
+
 # -------------------------------
 # USERS
 # -------------------------------
@@ -124,4 +125,23 @@ class EquipeViewSet(viewsets.ModelViewSet):
             return Response({"status": f"{user.username} agora é líder da equipe {equipe.nome}"})
         except User.DoesNotExist:
             return Response({"error": "Usuário não encontrado"}, status=400)
+
+            ### CÓDIGO ANTIGO DE EXEMPLO COMENTADO PARA REFERÊNCIA ###
 '''
+
+from rest_framework import viewsets, permissions
+from .models import Perfil, Evento, Atividade
+from .serializers import PerfilSerializer, EventoSerializer, AtividadeSerializer
+
+class PerfilViewSet(viewsets.ModelViewSet):
+    queryset = Perfil.objects.all()
+    serializer_class = PerfilSerializer
+    # permission_classes = [permissions.IsAuthenticated] # Descomente se quiser proteger
+
+class EventoViewSet(viewsets.ModelViewSet):
+    queryset = Evento.objects.all()
+    serializer_class = EventoSerializer
+
+class AtividadeViewSet(viewsets.ModelViewSet):
+    queryset = Atividade.objects.all()
+    serializer_class = AtividadeSerializer

@@ -38,16 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # CONFERIR:
-
-    '''# DRF
+    # CONFERIR:    
     'rest_framework',
     'rest_framework.authtoken',
     'drf_spectacular_sidecar',
     'drf_spectacular',
 
     # Nosso app
-    'core','''
+    'gestaoEventos',
 ]
 
 REST_FRAMEWORK = {
@@ -77,7 +75,7 @@ MIDDLEWARE = [
 
 
 
-ROOT_URLCONF = 'devlab.urls'
+ROOT_URLCONF = 'projeto.urls'
 
 TEMPLATES = [
     {
@@ -94,7 +92,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'devlab.wsgi.application'
+WSGI_APPLICATION = 'projeto.wsgi.application'
 
 
 # Database

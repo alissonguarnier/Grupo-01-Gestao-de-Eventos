@@ -1,9 +1,10 @@
+'''
 #core/serializers.py
 from rest_framework import serializers
 from django.contrib.auth.models import User
 'from .models import Projeto, Equipe'
 
-'''
+
 # -------------------------------
 # USER
 # -------------------------------
@@ -70,4 +71,29 @@ class EquipeSerializer(serializers.ModelSerializer):
             'membros',
             'membros_ids',
         ]
+        ### CÓDIGO ANTIGO DE EXEMPLO COMENTADO PARA REFERÊNCIA ###
 '''
+from rest_framework import serializers
+from django.contrib.auth.models import User
+from .models import Perfil, Evento, Atividade
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']
+
+class PerfilSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    class Meta:
+        model = Perfil
+        fields = '__all__'
+
+class EventoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Evento
+        fields = '__all__'
+
+class AtividadeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Atividade
+        fields = '__all__'
