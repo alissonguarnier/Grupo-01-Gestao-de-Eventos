@@ -1,73 +1,108 @@
-#core/serializers.py
 from rest_framework import serializers
 from django.contrib.auth.models import User
-'from .models import Projeto, Equipe'
+from .models import Perfil, Evento, Atividade, UserEventos
 
-'''
-# -------------------------------
-# USER
-# -------------------------------
+# ---------------------------------------------------------
+# 1. Serializers de Usuário e Perfil (Participante)
+# ---------------------------------------------------------
+
+class PerfilSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Perfil
+        fields = ['celular', 'tipo']
+
 class UserSerializer(serializers.ModelSerializer):
+    # Aninhamos o perfil para que, ao chamar o User, venha os dados do Perfil junto
+    perfil = PerfilSerializer()
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'perfil']
 
+    # Método create sobrescrito para salvar User e Perfil ao mesmo tempo
+    def create(self, validated_data):
+        perfil_data = validated_data.pop('perfil')
+        # Cria o User padrão do Django
+        user = User.objects.create(**validated_data)
+        # Cria o Perfil linkado a esse User
+        Perfil.objects.create(user=user, **perfil_data)
+        return user
 
-# -------------------------------
-# PROJETO
-# -------------------------------
-class ProjetoSerializer(serializers.ModelSerializer):
-    # participantes calculados a partir das equipes
-    participantes = serializers.SerializerMethodField()
+    # Método update para permitir atualizar dados de ambas as tabelas
+    def update(self, instance, validated_data):
+        perfil_data = validated_data.pop('perfil', None)
+        
+        # Atualiza campos do User
+        instance.username = validated_data.get('username', instance.username)
+        instance.email = validated_data.get('email', instance.email)
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.save()
 
-    class Meta:
-        model = Projeto
-        fields = [
-            'id',
-            'titulo',
-            'descricao',
-            'cliente',
-            'status',
-            'data_inicio',
-            'data_fim_prevista',
-            'participantes',
-        ]
+        # Atualiza campos do Perfil se houver
+        if perfil_data:
+            perfil = instance.perfil
+            perfil.celular = perfil_data.get('celular', perfil.celular)
+            perfil.tipo = perfil_data.get('tipo', perfil.tipo)
+            perfil.save()
+            
+        return instance
 
-    def get_participantes(self, obj):
-        # pega todos os membros das equipes do projeto
-        users = User.objects.filter(equipes__projeto=obj).distinct()
-        return UserSerializer(users, many=True).data
+# ---------------------------------------------------------
+# 2. Serializer de Atividade
+# ---------------------------------------------------------
 
-
-# -------------------------------
-# EQUIPE
-# -------------------------------
-class EquipeSerializer(serializers.ModelSerializer):
-    membros = UserSerializer(many=True, read_only=True)
-    membros_ids = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        many=True,
-        write_only=True,
-        source='membros'
-    )
-    lider = UserSerializer(read_only=True)
-    lider_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        write_only=True,
-        source='lider',
-        required=False
-    )
+class AtividadeSerializer(serializers.ModelSerializer):
+    # Campos de leitura para mostrar nomes em vez de apenas IDs
+    responsavel_nome = serializers.ReadOnlyField(source='responsavel.username')
+    evento_titulo = serializers.ReadOnlyField(source='evento.nome')
 
     class Meta:
-        model = Equipe
+        model = Atividade
         fields = [
-            'id',
-            'nome',
-            'descricao',
-            'projeto',
-            'lider',
-            'lider_id',
-            'membros',
-            'membros_ids',
+            'id', 'titulo', 'descricao', 'horario_inicio', 'horario_fim', 
+            'tipo', 'evento', 'evento_titulo', 'responsavel', 'responsavel_nome'
         ]
-'''
+
+# ---------------------------------------------------------
+# 3. Serializer de Inscrição (UserEventos)
+# ---------------------------------------------------------
+
+class UserEventosSerializer(serializers.ModelSerializer):
+    user_nome = serializers.ReadOnlyField(source='user.username')
+    evento_nome = serializers.ReadOnlyField(source='evento.nome')
+
+    class Meta:
+        model = UserEventos
+        fields = ['id', 'user', 'user_nome', 'evento', 'evento_nome', 'data_inscricao', 'status']
+
+# ---------------------------------------------------------
+# 4. Serializer de Evento
+# ---------------------------------------------------------
+
+class EventoSerializer(serializers.ModelSerializer):
+    # Mostra as atividades aninhadas dentro do evento (útil para detalhes)
+    # read_only=True garante que não precisamos enviar atividades ao criar um evento
+    atividades = AtividadeSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = Evento
+        fields = [
+            'id', 'nome', 'descricao', 'data_inicio', 'data_fim', 
+            'local', 'atividades'
+        ]
+
+class EventoDashboardSerializer(serializers.ModelSerializer):
+    """
+    Serializer especial para a rota de Dashboard.
+    Traz participantes e atividades tudo junto.
+    """
+    atividades = AtividadeSerializer(many=True, read_only=True)
+    inscricoes = UserEventosSerializer(source='usereventos_set', many=True, read_only=True)
+    
+    class Meta:
+        model = Evento
+        fields = [
+            'id', 'nome', 'data_inicio', 'local', 
+            'atividades', 'inscricoes'
+        ]
