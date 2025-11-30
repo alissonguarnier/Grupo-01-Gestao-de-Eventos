@@ -1,0 +1,74 @@
+@startuml
+hide methods
+hide stereotypes
+
+skinparam class {
+    BackgroundColor #ffffff
+    BorderColor #000000
+}
+
+' ============================
+' ENTIDADES
+' ============================
+
+class USERS {
+    + id : INT <<PK>>
+    username : String
+    email : String
+    password : String
+    is_active : Boolean
+    is_staff : Boolean
+    is_superuser : Boolean
+}
+
+class PERFIL {
+    + id_users : INT <<PK,FK>>
+    celular : String
+    tipo : String
+}
+
+class EVENTOS {
+    + id : INT <<PK>>
+    nome : String
+    descricao : String
+    data_inicio : DateTime
+    data_fim : DateTime
+    local : String
+}
+
+class ATIVIDADE {
+    + id : INT <<PK>>
+    titulo : String
+    descricao : String
+    horario_inicio : Time
+    horario_fim : Time
+    tipo : String
+    evento_fk : INT <<FK>>
+    responsavel_id : INT <<FK>>
+}
+
+class USEREVENTOS {
+    + id : INT <<PK>>
+    id_users : INT <<FK>>
+    id_eventos : INT <<FK>>
+    data_inscricao : DateTime
+}
+
+' ============================
+' RELACIONAMENTOS
+' ============================
+
+' 1:1 USERS — PERFIL
+USERS "1" -- "1" PERFIL : possui
+
+' 1:N EVENTOS — ATIVIDADE
+EVENTOS "1" -- "N" ATIVIDADE : contém
+
+' 1:N USERS — ATIVIDADE (responsável)
+USERS "1" -- "N" ATIVIDADE : responsável_por
+
+' N:N USERS — EVENTOS via USEREVENTOS
+USERS "1" --- "N" USEREVENTOS
+EVENTOS "1" -- "N" USEREVENTOS
+
+@enduml

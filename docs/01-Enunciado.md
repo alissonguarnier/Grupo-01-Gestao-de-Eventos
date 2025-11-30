@@ -101,6 +101,18 @@ Relacionamentos:
 - 1:N com Evento
 - 1:1 (ou 1:N) com Participante (responsável)
 
+
+Sugestão do professor:
+
+Entidade:
+- Perfil (completar o users)
+- Atividade
+- Evento
+
+-Criar dois grupos no views: 
+  - Participantes
+  - Organizadores
+
 ## **Sugestão de Rotas da API**
 
 ### **Rota principal**
