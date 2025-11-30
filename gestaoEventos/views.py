@@ -34,6 +34,8 @@ class EventoViewSet(viewsets.ModelViewSet):
     # Leitura é pública, mas criar/editar exige login 
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+    filterset_fields = ['local', 'data_inicio']
+
     # Rota: /api/eventos/{id}/atividades/ [cite: 83]
     @action(detail=True, methods=['get'])
     def atividades(self, request, pk=None):

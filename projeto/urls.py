@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from django.views.generic import RedirectView
+from rest_framework.authtoken.views import obtain_auth_token
 
 # Importações do Spectacular
 from drf_spectacular.views import (
@@ -25,6 +26,10 @@ urlpatterns = [
 
     # Redireciona a raiz (/) para a documentação (/api/docs/)
     path('', RedirectView.as_view(url='/api/docs/', permanent=False)),
+
+    # --- ROTA PARA PEGAR O TOKEN (LOGIN) ---
+    path('api/auth/token/', obtain_auth_token, name='api_token_auth'),
+    # ---------------------------------------
 
     # --- ROTAS DE DOCUMENTAÇÃO (SPECTACULAR) ---
     
