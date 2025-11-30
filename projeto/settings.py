@@ -57,8 +57,8 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'DevLab Project API',
-    'DESCRIPTION': 'Sistema de Gestão de Projetos Colaborativos para coordenadores, professores e estudantes.',
+    'TITLE': 'Gestao Eventos Project API',
+    'DESCRIPTION': 'Sistema de Gestão de Eventos Colaborativos para coordenadores, professores e estudantes.',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
