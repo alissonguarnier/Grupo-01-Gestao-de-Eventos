@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions
+"from rest_framework import viewsets, permissions"
 'from rest_framework.decorators import action'
 'from rest_framework.response import Response'
 'from django.contrib.auth.models import User'
@@ -125,3 +125,74 @@ class EquipeViewSet(viewsets.ModelViewSet):
         except User.DoesNotExist:
             return Response({"error": "Usuário não encontrado"}, status=400)
 '''
+
+"""""""""""""""""""""""" #CODIGO A PARTIR DAQUI """""""""""""""""""""""
+from rest_framework import viewsets, permissions
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from django.contrib.auth.models import User
+from .models import Evento, Perfil, Atividade
+'from .serializers import UserSerializer, EventoSerializer, PerfilSerializer, AtividadeSerializer'
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+    @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def Evento(self, request, pk=None):
+        user = self.get_object()
+        eventos = Evento.objects.filter(participantes=user).distinct()
+        serializer = EventoSerializer(eventos, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def perfil(self, request, pk=None):
+        user = self.get_object()
+        perfil = Perfil.objects.get(user=user)
+        serializer = PerfilSerializer(perfil)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def visao_geral(self, request, pk=None):
+        user = self.get_object()
+        eventos = Evento.objects.filter(participantes=user).distinct()
+        atividade = Atividade.objects.filter(participantes=user).distinct()
+        data = {
+            "usuario": UserSerializer(user).data,
+            "eventos": EventoSerializer(eventos, many=True).data,
+            "Atividades": AtividadeSerializer(atividade, many=True).data,
+        }
+        return Response(data)
+    
+
+# -------------------------------
+# EVENTOS
+# -------------------------------
+
+class EventoViewSet(viewsets.ModelViewSet):
+    queryset = Evento.objects.all()
+    serializer_class = EventoSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+    def get_permissions(self):
+        # Apenas staff pode criar, editar ou excluir
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [permissions.IsAdminUser()]
+        # Usuário comum só pode listar/consultar
+        return [permissions.IsAuthenticated()]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return Evento.objects.all()
+        # Eventos em que o usuário participa
+        return Evento.objects.filter(participantes=user).distinct()
+    
+    @action(detail=True, methods=['get'])
+    def participantes(self, request, pk=None, permission_classes=[permissions.IsAuthenticated]):
+        evento = self.get_object()
+        users = evento.participantes.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)

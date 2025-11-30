@@ -71,3 +71,25 @@ class EquipeSerializer(serializers.ModelSerializer):
             'membros_ids',
         ]
 '''
+
+
+""""""""""""""""""""""""""" #CODIGO A PARTIR DAQUI """""""""""""""""""""
+from rest_framework import serializers
+from django.contrib.auth.models import User
+from .models import Projeto, Equipe
+
+
+# -------------------------------
+# USER
+# -------------------------------
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']
+
+
+#class EventoSerializer
+
+#class PerfilSerializer
+
+#clas AtividadeSerializer
