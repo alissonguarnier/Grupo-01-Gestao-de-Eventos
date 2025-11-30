@@ -1,4 +1,4 @@
-# 📘 EventLab API — Sistema de Gestão de Eventoso
+# 📘 EventLab API — Sistema de Gestão de Eventos
 
 # 📑 Sumário
 
