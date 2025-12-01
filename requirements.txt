@@ -3,3 +3,4 @@ django-filter
 djangorestframework
 drf-spectacular
 drf-spectacular-sidecar
+django-cors-headers

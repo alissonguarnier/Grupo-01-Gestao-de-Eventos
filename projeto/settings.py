@@ -40,11 +40,14 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
+    'corsheaders',
     'drf_spectacular',
     'gestaoEventos',
+
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -154,3 +157,9 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'API para controle de eventos, atividades e inscrições.',
     'VERSION': '1.0.0',
 }
+
+# Permite o api com qualquer pagina html
+CORS_ALLOW_ALL_ORIGINS = True
+
+# Sessão expira sempre que fecha a aba
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
