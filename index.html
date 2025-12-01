@@ -23,6 +23,16 @@
       margin-bottom: 2rem;
     }
 
+    /* Regra específica para diminuir o Login */
+    #login-area {
+      max-width: 450px;
+      /* Largura máxima */
+      margin: 50px auto;
+      /* Centraliza na tela e dá espaço no topo */
+      text-align: center;
+      /* Centraliza o texto */
+    }
+
     .hidden {
       display: none;
     }
@@ -60,6 +70,11 @@
       background-color: #6c757d;
     }
 
+    button.admin {
+      background-color: #417690;
+    }
+
+    /* Cor roxa do Django */
     button.action {
       background-color: #28a745;
       font-size: 0.9em;
@@ -96,13 +111,10 @@
       background: #28a745;
     }
 
-    /* Confirmado */
     .badge-pend {
       background: #ffc107;
       color: black;
     }
-
-    /* Pendente */
   </style>
 </head>
 
@@ -120,8 +132,11 @@
 
   <div class="card hidden" id="dashboard-area">
     <div style="display: flex; justify-content: space-between; align-items: center;">
-      <p>Logado como: <strong>Admin</strong></p>
-      <button class="danger" onclick="logout()">Sair</button>
+      <p>Logado com: <strong id="nome-usuario">Visitante</strong></p>
+      <div>
+        <button class="admin" onclick="abrirAdmin()">⚙️ Painel Admin</button>
+        <button class="danger" onclick="logout()">Sair</button>
+      </div>
     </div>
     <hr>
 
@@ -136,8 +151,16 @@
   </div>
 
   <script>
-    localStorage.removeItem('user_token'); // Limpa token antigo ao abrir (Kill Switch)
+    localStorage.removeItem('user_token'); // Limpa token antigo ao abrir
     const API_URL = 'http://127.0.0.1:8000/api';
+    const ADMIN_URL = 'http://127.0.0.1:8000/admin/entrar/';
+
+    // --- INICIALIZAÇÃO ---
+    // Se a página for recarregada e tiver token, recupera o nome também (opcional, já que estamos limpando o token no início)
+    const userSalvo = localStorage.getItem('user_name');
+    if (userSalvo) {
+      document.getElementById('nome-usuario').innerText = userSalvo;
+    }
 
     // --- AUTENTICAÇÃO ---
     async function fazerLogin() {
@@ -155,14 +178,26 @@
 
         if (res.ok) {
           const data = await res.json();
+          // 1. SALVA O TOKEN E O NOME
           localStorage.setItem('user_token', data.token);
+          localStorage.setItem('user_name', user);
+
+          // 2. ATUALIZA O TEXTO NA TELA IMEDIATAMENTE
+          document.getElementById('nome-usuario').innerText = user;
+
+          // 3. TROCA DE TELA
           document.getElementById('login-area').classList.add('hidden');
           document.getElementById('dashboard-area').classList.remove('hidden');
-          listarEventos(); // Carrega eventos ao entrar
+          listarEventos();
         } else {
           status.innerText = "❌ Dados incorretos.";
         }
       } catch (e) { status.innerText = "❌ Erro de conexão."; }
+    }
+
+    function abrirAdmin() {
+      // window.open(ADMIN_URL, '_blank'); // <-- Isso abria em nova aba
+      window.location.href = ADMIN_URL;    // <-- Isso abre na MESMA aba
     }
 
     function logout() {
@@ -179,7 +214,6 @@
       return await res.json();
     }
 
-    // 1. LISTAR EVENTOS (COM BOTÃO DE DETALHES)
     async function listarEventos() {
       document.getElementById('titulo-secao').innerText = "📅 Lista de Eventos";
       const div = document.getElementById('conteudo-lista');
@@ -188,7 +222,6 @@
       try {
         const eventos = await fetchAPI('eventos/');
         div.innerHTML = "";
-
         if (eventos.length === 0) div.innerHTML = "Nenhum evento.";
 
         eventos.forEach(ev => {
@@ -196,7 +229,7 @@
                         <div class="item-lista">
                             <h3>${ev.nome}</h3>
                             <p>📍 ${ev.local} | 🗓️ ${ev.data_inicio}</p>
-                            <button class="action" onclick="verDetalhesEvento(${ev.id})">🔍 Ver Dashboard (Atividades & Inscritos)</button>
+                            <button class="action" onclick="verDetalhesEvento(${ev.id})">🔍 Ver Dashboard</button>
                             <div id="detalhes-${ev.id}" class="detalhes-area hidden"></div>
                         </div>
                     `;
@@ -204,83 +237,85 @@
       } catch (e) { div.innerHTML = "Erro ao carregar."; }
     }
 
-    // 2. VER DASHBOARD (ROTA PODEROSA)
     async function verDetalhesEvento(id) {
       const divDetalhes = document.getElementById(`detalhes-${id}`);
-
-      // Se já estiver aberto, fecha
       if (!divDetalhes.classList.contains('hidden')) {
         divDetalhes.classList.add('hidden');
         return;
       }
-
-      divDetalhes.innerHTML = "Carregando dados completos...";
+      divDetalhes.innerHTML = "Carregando...";
       divDetalhes.classList.remove('hidden');
 
       try {
-        // Chama a rota /dashboard/ que traz TUDO aninhado
         const dados = await fetchAPI(`eventos/${id}/dashboard/`);
 
-        // Monta HTML das Atividades
-        let htmlAtiv = "<h4>🎤 Atividades do Evento:</h4>";
+        let htmlAtiv = "<h4>🎤 Atividades:</h4>";
         if (dados.atividades && dados.atividades.length > 0) {
           htmlAtiv += "<ul>";
           dados.atividades.forEach(a => {
-            htmlAtiv += `<li><strong>${a.titulo}</strong> (${a.horario_inicio.slice(0, 5)}) - <em>${a.tipo}</em></li>`;
+            htmlAtiv += `<li><strong>${a.titulo}</strong> (${a.horario_inicio.slice(0, 5)})</li>`;
           });
           htmlAtiv += "</ul>";
-        } else { htmlAtiv += "<p>Nenhuma atividade cadastrada.</p>"; }
+        } else { htmlAtiv += "<p>Nenhuma.</p>"; }
 
-        // Monta HTML dos Inscritos
-        let htmlPart = "<h4>👥 Participantes Inscritos:</h4>";
+        let htmlPart = "<h4>👥 Inscritos:</h4>";
         if (dados.inscricoes && dados.inscricoes.length > 0) {
           htmlPart += "<ul>";
           dados.inscricoes.forEach(i => {
             const cor = i.status === 'C' ? 'badge-conf' : 'badge-pend';
-            const textoStatus = i.status === 'C' ? 'Confirmado' : 'Pendente';
-            htmlPart += `<li>${i.user_nome} <span class="badge ${cor}">${textoStatus}</span></li>`;
+            const texto = i.status === 'C' ? 'Confirmado' : 'Pendente';
+            htmlPart += `<li>${i.user_nome} <span class="badge ${cor}">${texto}</span></li>`;
           });
           htmlPart += "</ul>";
-        } else { htmlPart += "<p>Ninguém se inscreveu ainda.</p>"; }
+        } else { htmlPart += "<p>Ninguém.</p>"; }
 
         divDetalhes.innerHTML = htmlAtiv + "<hr>" + htmlPart;
-
-      } catch (e) { divDetalhes.innerHTML = "Erro ao carregar dashboard."; }
+      } catch (e) { divDetalhes.innerHTML = "Erro."; }
     }
 
-    // 3. LISTAR TODAS AS ATIVIDADES (GERAL)
     async function listarAtividades() {
-      document.getElementById('titulo-secao').innerText = "🎤 Todas as Atividades (Geral)";
+      document.getElementById('titulo-secao').innerText = "🎤 Todas Atividades";
       const div = document.getElementById('conteudo-lista');
       div.innerHTML = "Carregando...";
-
       const atividades = await fetchAPI('atividades/');
       div.innerHTML = "";
       atividades.forEach(a => {
-        div.innerHTML += `
-                    <div class="item-lista" style="border-left-color: #6c757d;">
-                        <strong>${a.titulo}</strong><br>
-                        Evento: ${a.evento_titulo || 'N/A'} <br>
-                        Responsável: ${a.responsavel_nome || 'A definir'}
-                    </div>`;
+        div.innerHTML += `<div class="item-lista" style="border-left-color: #6c757d;"><strong>${a.titulo}</strong><br>Evento: ${a.evento_titulo || 'N/A'}</div>`;
       });
     }
 
-    // 4. LISTAR TODOS OS PARTICIPANTES (GERAL)
     async function listarParticipantes() {
       document.getElementById('titulo-secao').innerText = "👥 Base de Usuários";
       const div = document.getElementById('conteudo-lista');
       div.innerHTML = "Carregando...";
 
-      const parts = await fetchAPI('participantes/');
-      div.innerHTML = "";
-      parts.forEach(p => {
-        div.innerHTML += `
-                    <div class="item-lista" style="border-left-color: #28a745;">
-                        <strong>${p.username}</strong> (${p.email})<br>
-                        Tipo: <span class="badge">${p.perfil ? p.perfil.tipo : 'N/A'}</span>
-                    </div>`;
-      });
+      try {
+        const parts = await fetchAPI('participantes/');
+        div.innerHTML = "";
+
+        // Dicionário para traduzir as letras do banco de dados
+        const nomesTipos = {
+          'P': 'Participante',
+          'C': 'Convidado',
+          'O': 'Organizador',
+          'X': 'Outros/Palestrante'
+        };
+
+        parts.forEach(p => {
+          // Se o usuário tiver perfil, pega o tipo. Se não, assume 'Outros'.
+          const sigla = p.perfil ? p.perfil.tipo : 'X';
+          const nomeTipo = nomesTipos[sigla] || sigla;
+
+          div.innerHTML += `
+                  <div class="item-lista" style="border-left-color: #28a745;">
+                      <strong>${p.username}</strong> (${p.email})<br>
+                      <span class="badge" style="background-color: #17a2b8;">${nomeTipo}</span>
+                      ${p.perfil && p.perfil.celular ? `<small>📞 ${p.perfil.celular}</small>` : ''}
+                  </div>`;
+        });
+      } catch (e) {
+        div.innerHTML = "Erro ao carregar participantes.";
+      }
     }
   </script>
 </body>

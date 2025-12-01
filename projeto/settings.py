@@ -158,4 +158,8 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
 }
 
+# Permite o api com qualquer pagina html
 CORS_ALLOW_ALL_ORIGINS = True
+
+# Sessão expira sempre que fecha a aba
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
