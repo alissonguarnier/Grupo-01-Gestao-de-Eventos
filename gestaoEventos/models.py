@@ -73,3 +73,7 @@ class UserEventos(models.Model):
     class Meta:
         # Garante que um usuário só pode se inscrever uma vez em um evento específico
         unique_together = ('user', 'evento')
+
+        # Adiciona os nomes bonitos para o Admin
+        verbose_name = "Inscrição"
+        verbose_name_plural = "Inscrições"

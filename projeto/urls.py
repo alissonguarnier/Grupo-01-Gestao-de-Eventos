@@ -14,6 +14,12 @@ from drf_spectacular.views import (
 # Importações das suas Views (Use os nomes do seu projeto)
 from gestaoEventos.views import EventoViewSet, AtividadeViewSet, UserViewSet
 
+# --- PERSONALIZAÇÃO DO ADMIN ---
+admin.site.site_header = "Administração EventLab"  # Texto no topo do Login e da Dashboard
+admin.site.site_title = "EventLab Admin"           # Texto na aba do navegador
+admin.site.index_title = "Gestão de Eventos - Projeto Integrador"       # Texto na lista de apps (Home do Admin)
+# -------------------------------
+
 # Configuração do Router
 router = DefaultRouter()
 router.register(r'eventos', EventoViewSet, basename='evento')
