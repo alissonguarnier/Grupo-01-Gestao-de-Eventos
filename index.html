@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <title>EventLab - Super Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      background-color: #f0f2f5;
+      color: #333;
+    }
+
+    /* Cards e Layout */
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Botões e Inputs */
+    input {
+      padding: 12px;
+      margin: 5px 0;
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    button.danger {
+      background-color: #dc3545;
+    }
+
+    button.secondary {
+      background-color: #6c757d;
+    }
+
+    button.action {
+      background-color: #28a745;
+      font-size: 0.9em;
+      padding: 5px 10px;
+    }
+
+    /* Estilos das Listas */
+    .item-lista {
+      border-left: 4px solid #007bff;
+      background: #f8f9fa;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+    }
+
+    .detalhes-area {
+      background-color: #e9ecef;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #dee2e6;
+    }
+
+    /* Tags */
+    .badge {
+      background: #17a2b8;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.8em;
+    }
+
+    .badge-conf {
+      background: #28a745;
+    }
+
+    /* Confirmado */
+    .badge-pend {
+      background: #ffc107;
+      color: black;
+    }
+
+    /* Pendente */
+  </style>
+</head>
+
+<body>
+
+  <h1>🚀 EventLab Dashboard</h1>
+
+  <div class="card" id="login-area">
+    <h2>🔐 Acesso Restrito</h2>
+    <input type="text" id="username" placeholder="Usuário (ex: root)">
+    <input type="password" id="password" placeholder="Senha">
+    <button type="button" onclick="fazerLogin()">Entrar</button>
+    <div id="status-login" style="color: red; margin-top: 10px;"></div>
+  </div>
+
+  <div class="card hidden" id="dashboard-area">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <p>Logado como: <strong>Admin</strong></p>
+      <button class="danger" onclick="logout()">Sair</button>
+    </div>
+    <hr>
+
+    <div style="margin-bottom: 20px;">
+      <button onclick="listarEventos()">📅 Eventos</button>
+      <button class="secondary" onclick="listarAtividades()">🎤 Todas Atividades</button>
+      <button class="secondary" onclick="listarParticipantes()">👥 Todos Participantes</button>
+    </div>
+
+    <h2 id="titulo-secao">Eventos</h2>
+    <div id="conteudo-lista">Carregando...</div>
+  </div>
+
+  <script>
+    localStorage.removeItem('user_token'); // Limpa token antigo ao abrir (Kill Switch)
+    const API_URL = 'http://127.0.0.1:8000/api';
+
+    // --- AUTENTICAÇÃO ---
+    async function fazerLogin() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      const status = document.getElementById('status-login');
+      status.innerText = "Conectando...";
+
+      try {
+        const res = await fetch(`${API_URL}/auth/token/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: user, password: pass })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          localStorage.setItem('user_token', data.token);
+          document.getElementById('login-area').classList.add('hidden');
+          document.getElementById('dashboard-area').classList.remove('hidden');
+          listarEventos(); // Carrega eventos ao entrar
+        } else {
+          status.innerText = "❌ Dados incorretos.";
+        }
+      } catch (e) { status.innerText = "❌ Erro de conexão."; }
+    }
+
+    function logout() {
+      localStorage.removeItem('user_token');
+      window.location.reload();
+    }
+
+    // --- FUNÇÕES DE BUSCA (GET) ---
+    async function fetchAPI(endpoint) {
+      const token = localStorage.getItem('user_token');
+      const res = await fetch(`${API_URL}/${endpoint}`, {
+        headers: { 'Authorization': `Token ${token}` }
+      });
+      return await res.json();
+    }
+
+    // 1. LISTAR EVENTOS (COM BOTÃO DE DETALHES)
+    async function listarEventos() {
+      document.getElementById('titulo-secao').innerText = "📅 Lista de Eventos";
+      const div = document.getElementById('conteudo-lista');
+      div.innerHTML = "Carregando...";
+
+      try {
+        const eventos = await fetchAPI('eventos/');
+        div.innerHTML = "";
+
+        if (eventos.length === 0) div.innerHTML = "Nenhum evento.";
+
+        eventos.forEach(ev => {
+          div.innerHTML += `
+                        <div class="item-lista">
+                            <h3>${ev.nome}</h3>
+                            <p>📍 ${ev.local} | 🗓️ ${ev.data_inicio}</p>
+                            <button class="action" onclick="verDetalhesEvento(${ev.id})">🔍 Ver Dashboard (Atividades & Inscritos)</button>
+                            <div id="detalhes-${ev.id}" class="detalhes-area hidden"></div>
+                        </div>
+                    `;
+        });
+      } catch (e) { div.innerHTML = "Erro ao carregar."; }
+    }
+
+    // 2. VER DASHBOARD (ROTA PODEROSA)
+    async function verDetalhesEvento(id) {
+      const divDetalhes = document.getElementById(`detalhes-${id}`);
+
+      // Se já estiver aberto, fecha
+      if (!divDetalhes.classList.contains('hidden')) {
+        divDetalhes.classList.add('hidden');
+        return;
+      }
+
+      divDetalhes.innerHTML = "Carregando dados completos...";
+      divDetalhes.classList.remove('hidden');
+
+      try {
+        // Chama a rota /dashboard/ que traz TUDO aninhado
+        const dados = await fetchAPI(`eventos/${id}/dashboard/`);
+
+        // Monta HTML das Atividades
+        let htmlAtiv = "<h4>🎤 Atividades do Evento:</h4>";
+        if (dados.atividades && dados.atividades.length > 0) {
+          htmlAtiv += "<ul>";
+          dados.atividades.forEach(a => {
+            htmlAtiv += `<li><strong>${a.titulo}</strong> (${a.horario_inicio.slice(0, 5)}) - <em>${a.tipo}</em></li>`;
+          });
+          htmlAtiv += "</ul>";
+        } else { htmlAtiv += "<p>Nenhuma atividade cadastrada.</p>"; }
+
+        // Monta HTML dos Inscritos
+        let htmlPart = "<h4>👥 Participantes Inscritos:</h4>";
+        if (dados.inscricoes && dados.inscricoes.length > 0) {
+          htmlPart += "<ul>";
+          dados.inscricoes.forEach(i => {
+            const cor = i.status === 'C' ? 'badge-conf' : 'badge-pend';
+            const textoStatus = i.status === 'C' ? 'Confirmado' : 'Pendente';
+            htmlPart += `<li>${i.user_nome} <span class="badge ${cor}">${textoStatus}</span></li>`;
+          });
+          htmlPart += "</ul>";
+        } else { htmlPart += "<p>Ninguém se inscreveu ainda.</p>"; }
+
+        divDetalhes.innerHTML = htmlAtiv + "<hr>" + htmlPart;
+
+      } catch (e) { divDetalhes.innerHTML = "Erro ao carregar dashboard."; }
+    }
+
+    // 3. LISTAR TODAS AS ATIVIDADES (GERAL)
+    async function listarAtividades() {
+      document.getElementById('titulo-secao').innerText = "🎤 Todas as Atividades (Geral)";
+      const div = document.getElementById('conteudo-lista');
+      div.innerHTML = "Carregando...";
+
+      const atividades = await fetchAPI('atividades/');
+      div.innerHTML = "";
+      atividades.forEach(a => {
+        div.innerHTML += `
+                    <div class="item-lista" style="border-left-color: #6c757d;">
+                        <strong>${a.titulo}</strong><br>
+                        Evento: ${a.evento_titulo || 'N/A'} <br>
+                        Responsável: ${a.responsavel_nome || 'A definir'}
+                    </div>`;
+      });
+    }
+
+    // 4. LISTAR TODOS OS PARTICIPANTES (GERAL)
+    async function listarParticipantes() {
+      document.getElementById('titulo-secao').innerText = "👥 Base de Usuários";
+      const div = document.getElementById('conteudo-lista');
+      div.innerHTML = "Carregando...";
+
+      const parts = await fetchAPI('participantes/');
+      div.innerHTML = "";
+      parts.forEach(p => {
+        div.innerHTML += `
+                    <div class="item-lista" style="border-left-color: #28a745;">
+                        <strong>${p.username}</strong> (${p.email})<br>
+                        Tipo: <span class="badge">${p.perfil ? p.perfil.tipo : 'N/A'}</span>
+                    </div>`;
+      });
+    }
+  </script>
+</body>
+
+</html>
