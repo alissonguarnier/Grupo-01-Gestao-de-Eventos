@@ -3,7 +3,51 @@ from django.contrib.auth.models import User
 from .models import Perfil, Evento, Atividade, UserEventos
 
 # ---------------------------------------------------------
-# 1. Serializers de Usuário e Perfil (Participante)
+# 1. Serializer de Inscrição (UserEventos)
+# ---------------------------------------------------------
+
+class UserEventosSerializer(serializers.ModelSerializer):
+    user_nome = serializers.ReadOnlyField(source='user.username')
+    evento_nome = serializers.ReadOnlyField(source='evento.nome')
+
+    class Meta:
+        model = UserEventos
+        fields = ['id', 'user', 'user_nome', 'evento', 'evento_nome', 'data_inscricao', 'status']
+
+# ---------------------------------------------------------
+# 3. Serializer de Atividade
+# ---------------------------------------------------------
+
+class AtividadeSerializer(serializers.ModelSerializer):
+    # Campos de leitura para mostrar nomes em vez de apenas IDs
+    responsavel_nome = serializers.ReadOnlyField(source='responsavel.username')
+    evento_titulo = serializers.ReadOnlyField(source='evento.nome')
+
+    class Meta:
+        model = Atividade
+        fields = [
+            'id', 'titulo', 'descricao', 'horario_inicio', 'horario_fim', 
+            'tipo', 'evento', 'evento_titulo', 'responsavel', 'responsavel_nome'
+        ]
+
+# ---------------------------------------------------------
+# 4. Serializer de Evento
+# ---------------------------------------------------------
+
+class EventoSerializer(serializers.ModelSerializer):
+    # Mostra as atividades aninhadas dentro do evento (útil para detalhes)
+    # read_only=True garante que não precisamos enviar atividades ao criar um evento
+    atividades = AtividadeSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = Evento
+        fields = [
+            'id', 'nome', 'descricao', 'data_inicio', 'data_fim', 
+            'local', 'atividades'
+        ]
+
+# ---------------------------------------------------------
+# 2. Serializers de Usuário e Perfil (Participante)
 # ---------------------------------------------------------
 
 class PerfilSerializer(serializers.ModelSerializer):
@@ -15,9 +59,16 @@ class UserSerializer(serializers.ModelSerializer):
     # Aninhamos o perfil para que, ao chamar o User, venha os dados do Perfil junto
     perfil = PerfilSerializer()
 
+    # Traz as inscrições (Eventos que ele participa)
+    inscricoes = UserEventosSerializer(source='usereventos_set', many=True, read_only=True)
+    
+    # Traz as atividades que ele é responsável (Palestrante/Líder)
+    atividades_lideradas = AtividadeSerializer(source='atividades_responsavel', many=True, read_only=True)
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'perfil']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'perfil', 'inscricoes', 'atividades_lideradas']
+        # Adicionado 'inscricoes' e 'atividades_lideradas' na lista acima
 
     # Método create sobrescrito para salvar User e Perfil ao mesmo tempo
     def create(self, validated_data):
@@ -47,50 +98,6 @@ class UserSerializer(serializers.ModelSerializer):
             perfil.save()
             
         return instance
-
-# ---------------------------------------------------------
-# 2. Serializer de Atividade
-# ---------------------------------------------------------
-
-class AtividadeSerializer(serializers.ModelSerializer):
-    # Campos de leitura para mostrar nomes em vez de apenas IDs
-    responsavel_nome = serializers.ReadOnlyField(source='responsavel.username')
-    evento_titulo = serializers.ReadOnlyField(source='evento.nome')
-
-    class Meta:
-        model = Atividade
-        fields = [
-            'id', 'titulo', 'descricao', 'horario_inicio', 'horario_fim', 
-            'tipo', 'evento', 'evento_titulo', 'responsavel', 'responsavel_nome'
-        ]
-
-# ---------------------------------------------------------
-# 3. Serializer de Inscrição (UserEventos)
-# ---------------------------------------------------------
-
-class UserEventosSerializer(serializers.ModelSerializer):
-    user_nome = serializers.ReadOnlyField(source='user.username')
-    evento_nome = serializers.ReadOnlyField(source='evento.nome')
-
-    class Meta:
-        model = UserEventos
-        fields = ['id', 'user', 'user_nome', 'evento', 'evento_nome', 'data_inscricao', 'status']
-
-# ---------------------------------------------------------
-# 4. Serializer de Evento
-# ---------------------------------------------------------
-
-class EventoSerializer(serializers.ModelSerializer):
-    # Mostra as atividades aninhadas dentro do evento (útil para detalhes)
-    # read_only=True garante que não precisamos enviar atividades ao criar um evento
-    atividades = AtividadeSerializer(many=True, read_only=True)
-    
-    class Meta:
-        model = Evento
-        fields = [
-            'id', 'nome', 'descricao', 'data_inicio', 'data_fim', 
-            'local', 'atividades'
-        ]
 
 class EventoDashboardSerializer(serializers.ModelSerializer):
     """

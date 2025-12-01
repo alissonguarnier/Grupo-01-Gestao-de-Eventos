@@ -124,7 +124,7 @@
 
   <div class="card" id="login-area">
     <h2>🔐 Acesso Restrito</h2>
-    <input type="text" id="username" placeholder="Usuário (ex: root)">
+    <input type="text" id="username" placeholder="Usuário">
     <input type="password" id="password" placeholder="Senha">
     <button type="button" onclick="fazerLogin()">Entrar</button>
     <div id="status-login" style="color: red; margin-top: 10px;"></div>
@@ -214,6 +214,17 @@
       return await res.json();
     }
 
+    // Função auxiliar para formatar datas
+    function formatarData(dataString) {
+      if (!dataString) return 'Data indefinida';
+
+      const opcoes = { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+      const data = new Date(dataString);
+
+      // Retorna algo como: "10 de nov. de 2025 09:00"
+      return data.toLocaleDateString('pt-BR', opcoes);
+    }
+
     async function listarEventos() {
       document.getElementById('titulo-secao').innerText = "📅 Lista de Eventos";
       const div = document.getElementById('conteudo-lista');
@@ -225,11 +236,13 @@
         if (eventos.length === 0) div.innerHTML = "Nenhum evento.";
 
         eventos.forEach(ev => {
+          const dataBonita = formatarData(ev.data_inicio);
+
           div.innerHTML += `
                         <div class="item-lista">
                             <h3>${ev.nome}</h3>
-                            <p>📍 ${ev.local} | 🗓️ ${ev.data_inicio}</p>
-                            <button class="action" onclick="verDetalhesEvento(${ev.id})">🔍 Ver Dashboard</button>
+                            <p>📍 ${ev.local} | 🗓️ ${dataBonita}</p>
+                            <button class="action" onclick="verDetalhesEvento(${ev.id})">🔍 Ver Detalhes</button>
                             <div id="detalhes-${ev.id}" class="detalhes-area hidden"></div>
                         </div>
                     `;
@@ -239,51 +252,126 @@
 
     async function verDetalhesEvento(id) {
       const divDetalhes = document.getElementById(`detalhes-${id}`);
+
       if (!divDetalhes.classList.contains('hidden')) {
         divDetalhes.classList.add('hidden');
         return;
       }
-      divDetalhes.innerHTML = "Carregando...";
+
+      divDetalhes.innerHTML = "Carregando dados completos...";
       divDetalhes.classList.remove('hidden');
 
       try {
         const dados = await fetchAPI(`eventos/${id}/dashboard/`);
 
-        let htmlAtiv = "<h4>🎤 Atividades:</h4>";
+        let htmlAtiv = "<h4>🎤 Atividades do Evento:</h4>";
+
+        // 1. Dicionário de Tradução
+        const tiposMap = {
+          'P': 'Palestra',
+          'W': 'Workshop',
+          'O': 'Oficina',
+          'X': 'Outros'
+        };
+
         if (dados.atividades && dados.atividades.length > 0) {
           htmlAtiv += "<ul>";
           dados.atividades.forEach(a => {
-            htmlAtiv += `<li><strong>${a.titulo}</strong> (${a.horario_inicio.slice(0, 5)})</li>`;
+            // 2. Formata a data
+            const inicio = a.horario_inicio ? formatarData(a.horario_inicio) : 'Horário a definir';
+
+            // 3. TRADUÇÃO DO TIPO (O Pulo do Gato)
+            // Tenta achar 'P' no mapa. Se achar, usa 'Palestra'. Se não, usa 'P' mesmo.
+            const nomeTipo = tiposMap[a.tipo] || a.tipo || 'Atividade';
+
+            htmlAtiv += `
+              <li style="margin-bottom: 8px;">
+                  <strong>${a.titulo}</strong> 
+                  <span class="badge" style="background-color: #6f42c1;">${nomeTipo}</span>
+                  <br>
+                  <small style="color: #666;">🕒 Início: ${inicio}</small>
+              </li>`;
           });
           htmlAtiv += "</ul>";
-        } else { htmlAtiv += "<p>Nenhuma.</p>"; }
+        } else {
+          htmlAtiv += "<p>Nenhuma atividade cadastrada.</p>";
+        }
 
-        let htmlPart = "<h4>👥 Inscritos:</h4>";
+        // --- INSCRITOS ---
+        let htmlPart = "<h4>👥 Participantes Inscritos:</h4>";
         if (dados.inscricoes && dados.inscricoes.length > 0) {
           htmlPart += "<ul>";
           dados.inscricoes.forEach(i => {
             const cor = i.status === 'C' ? 'badge-conf' : 'badge-pend';
-            const texto = i.status === 'C' ? 'Confirmado' : 'Pendente';
-            htmlPart += `<li>${i.user_nome} <span class="badge ${cor}">${texto}</span></li>`;
+            const textoStatus = i.status === 'C' ? 'Confirmado' : 'Pendente';
+            htmlPart += `<li>${i.user_nome} <span class="badge ${cor}">${textoStatus}</span></li>`;
           });
           htmlPart += "</ul>";
-        } else { htmlPart += "<p>Ninguém.</p>"; }
+        } else { htmlPart += "<p>Ninguém se inscreveu ainda.</p>"; }
 
         divDetalhes.innerHTML = htmlAtiv + "<hr>" + htmlPart;
-      } catch (e) { divDetalhes.innerHTML = "Erro."; }
+
+      } catch (e) {
+        console.error(e);
+        divDetalhes.innerHTML = "Erro ao carregar dashboard.";
+      }
     }
 
     async function listarAtividades() {
-      document.getElementById('titulo-secao').innerText = "🎤 Todas Atividades";
+      document.getElementById('titulo-secao').innerText = "🎤 Todas as Atividades";
       const div = document.getElementById('conteudo-lista');
       div.innerHTML = "Carregando...";
-      const atividades = await fetchAPI('atividades/');
-      div.innerHTML = "";
-      atividades.forEach(a => {
-        div.innerHTML += `<div class="item-lista" style="border-left-color: #6c757d;"><strong>${a.titulo}</strong><br>Evento: ${a.evento_titulo || 'N/A'}</div>`;
-      });
+
+      try {
+        const atividades = await fetchAPI('atividades/');
+        div.innerHTML = "";
+
+        if (atividades.length === 0) {
+          div.innerHTML = "<p>Nenhuma atividade encontrada.</p>";
+          return;
+        }
+
+        // Mapa de tipos para tradução
+        const tiposMap = {
+          'P': 'Palestra',
+          'W': 'Workshop',
+          'O': 'Oficina',
+          'X': 'Outros'
+        };
+
+        atividades.forEach(a => {
+          // 1. Formatação de Data e Hora
+          const inicio = a.horario_inicio ? formatarData(a.horario_inicio) : 'Data a definir';
+          const fim = a.horario_fim ? formatarData(a.horario_fim) : '?';
+
+          // 2. Tratamento de campos nulos
+          const responsavel = a.responsavel_nome ? a.responsavel_nome : 'A definir';
+          const evento = a.evento_titulo || 'Evento não informado';
+
+          // 3. Tradução do Tipo
+          const nomeTipo = tiposMap[a.tipo] || a.tipo;
+
+          div.innerHTML += `
+                        <div class="item-lista" style="border-left-color: #6f42c1;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <h3 style="margin: 0; font-size: 1.1em;">${a.titulo}</h3>
+                                <span class="badge" style="background-color: #6f42c1;">${nomeTipo}</span>
+                            </div>
+                            
+                            <div style="margin-top: 10px; color: #555; font-size: 0.95em;">
+                                <p style="margin: 5px 0;">🕒 <strong>Quando:</strong> ${inicio} até ${fim.split(' ').pop()}</p>
+                                <p style="margin: 5px 0;">👤 <strong>Responsável:</strong> ${responsavel}</p>
+                                <p style="margin: 5px 0;">📍 <strong>Evento:</strong> <em>${evento}</em></p>
+                            </div>
+                        </div>`;
+        });
+      } catch (e) {
+        console.error(e);
+        div.innerHTML = "Erro ao carregar atividades.";
+      }
     }
 
+    // --- ATUALIZAÇÃO: LISTAR PARTICIPANTES COM DETALHES ---
     async function listarParticipantes() {
       document.getElementById('titulo-secao').innerText = "👥 Base de Usuários";
       const div = document.getElementById('conteudo-lista');
@@ -293,28 +381,88 @@
         const parts = await fetchAPI('participantes/');
         div.innerHTML = "";
 
-        // Dicionário para traduzir as letras do banco de dados
         const nomesTipos = {
-          'P': 'Participante',
-          'C': 'Convidado',
-          'O': 'Organizador',
-          'X': 'Outros/Palestrante'
+          'P': 'Participante', 'C': 'Convidado',
+          'O': 'Organizador', 'X': 'Outros/Palestrante'
         };
 
         parts.forEach(p => {
-          // Se o usuário tiver perfil, pega o tipo. Se não, assume 'Outros'.
           const sigla = p.perfil ? p.perfil.tipo : 'X';
           const nomeTipo = nomesTipos[sigla] || sigla;
 
           div.innerHTML += `
-                  <div class="item-lista" style="border-left-color: #28a745;">
-                      <strong>${p.username}</strong> (${p.email})<br>
-                      <span class="badge" style="background-color: #17a2b8;">${nomeTipo}</span>
-                      ${p.perfil && p.perfil.celular ? `<small>📞 ${p.perfil.celular}</small>` : ''}
-                  </div>`;
+                        <div class="item-lista" style="border-left-color: #28a745;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <strong>${p.username}</strong> <br>
+                                    <small>${p.email}</small> <br>
+                                    <span class="badge" style="background-color: #17a2b8;">${nomeTipo}</span>
+                                    ${p.perfil && p.perfil.celular ? `<small>📞 ${p.perfil.celular}</small>` : ''}
+                                </div>
+                                <button class="action" onclick="verDetalhesParticipante(${p.id})">📋 Ver Detalhes</button>
+                            </div>
+                            <div id="detalhes-part-${p.id}" class="detalhes-area hidden" style="margin-top: 15px;"></div>
+                        </div>`;
         });
       } catch (e) {
         div.innerHTML = "Erro ao carregar participantes.";
+      }
+    }
+
+    // --- NOVA FUNÇÃO: DETALHES DO PARTICIPANTE ---
+    async function verDetalhesParticipante(id) {
+      const divDetalhes = document.getElementById(`detalhes-part-${id}`);
+
+      if (!divDetalhes.classList.contains('hidden')) {
+        divDetalhes.classList.add('hidden');
+        return;
+      }
+
+      divDetalhes.innerHTML = "Carregando histórico...";
+      divDetalhes.classList.remove('hidden');
+
+      try {
+        // Buscamos os dados detalhados desse ID específico
+        const p = await fetchAPI(`participantes/${id}/`);
+
+        let html = "";
+
+        // 1. EVENTOS INSCRITOS
+        html += "<h4>📅 Inscrições em Eventos:</h4>";
+        if (p.inscricoes && p.inscricoes.length > 0) {
+          html += "<ul>";
+          p.inscricoes.forEach(ins => {
+            const statusTexto = ins.status === 'C' ? 'Confirmado' : 'Pendente';
+            const cor = ins.status === 'C' ? 'green' : 'orange';
+            // Usa a data de inscrição formatada
+            const dataInsc = formatarData(ins.data_inscricao);
+
+            html += `
+                            <li style="margin-bottom: 5px;">
+                                <strong>${ins.evento_nome}</strong> 
+                                <span style="color:${cor}; font-weight:bold; font-size:0.8em;">[${statusTexto}]</span>
+                                <br><small>Inscrito em: ${dataInsc}</small>
+                            </li>`;
+          });
+          html += "</ul>";
+        } else {
+          html += "<p>Nenhuma inscrição encontrada.</p>";
+        }
+
+        // 2. ATIVIDADES QUE ELE PALESTRA/LIDERA
+        if (p.atividades_lideradas && p.atividades_lideradas.length > 0) {
+          html += "<hr><h4>🎤 Palestrante/Responsável em:</h4><ul>";
+          p.atividades_lideradas.forEach(ativ => {
+            html += `<li><strong>${ativ.titulo}</strong> (${ativ.evento_titulo})</li>`;
+          });
+          html += "</ul>";
+        }
+
+        divDetalhes.innerHTML = html;
+
+      } catch (e) {
+        console.error(e);
+        divDetalhes.innerHTML = "Erro ao carregar detalhes.";
       }
     }
   </script>
