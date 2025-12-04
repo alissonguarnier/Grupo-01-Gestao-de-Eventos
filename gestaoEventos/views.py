@@ -17,7 +17,7 @@ from .serializers import (
 class UserViewSet(viewsets.ModelViewSet):
     """
     Endpoint para gerenciar participantes (Users + Perfil).
-    Rota: /api/participantes/ [cite: 86]
+    Rota: /api/participantes/ 
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -27,7 +27,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class EventoViewSet(viewsets.ModelViewSet):
     """
     Endpoint principal de Eventos.
-    Rota: /api/eventos/ [cite: 79]
+    Rota: /api/eventos/ 
     """
     queryset = Evento.objects.all()
     serializer_class = EventoSerializer
@@ -36,7 +36,7 @@ class EventoViewSet(viewsets.ModelViewSet):
 
     filterset_fields = ['local', 'data_inicio']
 
-    # Rota: /api/eventos/{id}/atividades/ [cite: 83]
+    # Rota: /api/eventos/{id}/atividades/ 
     @action(detail=True, methods=['get'])
     def atividades(self, request, pk=None):
         """Lista apenas as atividades de um evento específico"""
@@ -86,13 +86,13 @@ class EventoViewSet(viewsets.ModelViewSet):
 class AtividadeViewSet(viewsets.ModelViewSet):
     """
     Endpoint para gerenciar Atividades.
-    Rota: /api/atividades/ [cite: 90]
+    Rota: /api/atividades/ 
     """
     queryset = Atividade.objects.all()
     serializer_class = AtividadeSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    # Rota: /api/atividades/{id}/responsavel/ [cite: 92]
+    # Rota: /api/atividades/{id}/responsavel/ 
     @action(detail=True, methods=['patch'])
     def responsavel(self, request, pk=None):
         """Define um responsável pela atividade via ID do usuário"""
