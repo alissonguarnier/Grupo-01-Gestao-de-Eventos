@@ -11,7 +11,7 @@ skinparam class {
 ' ENTIDADES
 ' ============================
 
-class USERS {
+class User {
     + id : INT <<PK>>
     username : String
     email : String
@@ -21,13 +21,13 @@ class USERS {
     is_superuser : Boolean
 }
 
-class PERFIL {
-    + id_users : INT <<PK,FK>>
+class Perfil {
+    + user_id : INT <<PK,FK>>
     celular : String
     tipo : String
 }
 
-class EVENTOS {
+class Evento {
     + id : INT <<PK>>
     nome : String
     descricao : String
@@ -36,21 +36,21 @@ class EVENTOS {
     local : String
 }
 
-class ATIVIDADE {
+class Atividade {
     + id : INT <<PK>>
     titulo : String
     descricao : String
     horario_inicio : Time
     horario_fim : Time
     tipo : String
-    evento_fk : INT <<FK>>
+    evento_id : INT <<FK>>
     responsavel_id : INT <<FK>>
 }
 
-class USEREVENTOS {
+class UserEvento {
     + id : INT <<PK>>
-    id_users : INT <<FK>>
-    id_eventos : INT <<FK>>
+    user_id : INT <<FK>>
+    evento_id : INT <<FK>>
     data_inscricao : DateTime
 }
 
@@ -59,16 +59,17 @@ class USEREVENTOS {
 ' ============================
 
 ' 1:1 USERS — PERFIL
-USERS "1" -- "1" PERFIL : possui
+User "1 " -- "1 " Perfil : possui
 
 ' 1:N EVENTOS — ATIVIDADE
-EVENTOS "1" -- "N" ATIVIDADE : contém
+Evento "1  " -- "N  " Atividade : contém
 
 ' 1:N USERS — ATIVIDADE (responsável)
-USERS "1" -- "N" ATIVIDADE : responsável_por
+User "1" -- "N    " Atividade : responsável_por
 
 ' N:N USERS — EVENTOS via USEREVENTOS
-USERS "1" --- "N" USEREVENTOS
-EVENTOS "1" -- "N" USEREVENTOS
+User "1   " --- "N        " UserEvento
+Evento "1 " -- "        N" UserEvento
+
 
 @enduml

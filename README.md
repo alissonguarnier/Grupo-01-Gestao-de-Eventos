@@ -55,11 +55,11 @@ O sistema utiliza autenticação, permissões de acesso e rotas de relacionament
 | Pacote                   | Versão | Descrição              |
 | ------------------------ | ------ | ---------------------- |
 | Django                   | ≥5.0   | Framework principal    |
+| django-filter            | latest | Função filter do django|
 | djangorestframework      | latest | API REST               |
 | drf-spectacular          | latest | Documentação OpenAPI   |
 | drf-spectacular-sidecar  | latest | UI Swagger/ReDoc       |
-| rest_framework.authtoken | latest | Autenticação por token |
-| sqlite3                  | latest | Banco de dados padrão  |
+| django-cors-headers      | latest | Segurança do HTML      |
 
 > A lista completa e as versões exatas estão em **requirements.txt**.
 
@@ -68,25 +68,43 @@ O sistema utiliza autenticação, permissões de acesso e rotas de relacionament
 # 📁 Estrutura do Projeto
 
 ```
-eventlab/
+GRUPO-01-GESTAO-DE-EVENTOS/
 ├── manage.py
 ├── requirements.txt
-├── config/
+├── README.md
+├── projeto/
 │   ├── settings.py
 │   ├── urls.py
-│   └── wsgi.py
-├── core/
-│   ├── models.py
-│   ├── views.py
-│   ├── serializers.py
+│   ├── wsgi.py
+│   └── ...
+├── gestaoEventos/
+│   ├── management/
+│   │   ├── commands/
+│   │   │   ├── importar_dados
+│   │   │   ├── ...
+│   │   └── ...
+│   ├── migrations/
+│   │   ├── initial.py
+│   │   ├── alter_usereventos_options.py
+│   │   └── ...
 │   ├── admin.py
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
 │   └── ...
 └── docs/
-    └── database_diagram.png
+    ├── management/
+    │   ├── DER_banco.pu
+    │   └── MER_banco.brM3
+    ├── 01-Enunciado.md
+    ├── 02-Documentacao-extra.md
+    ├── 03-DER_banco.png
+    └── 04-MER_banco.png
+
 ```
 
-* **config/** → Configurações principais do Django
-* **core/** → Aplicação principal (modelos, views, serializers, routers)
+* **projeto/** → Configurações principais do Django
+* **gestaoEventos/** → Aplicação principal (modelos, views, serializers, routers)
 * **docs/** → Diagramas e arquivos de documentação
 
 ---
@@ -94,6 +112,9 @@ eventlab/
 # 🗂️ Diagrama de Banco de Dados
 
 ## Entidades e Relacionamentos
+
+![DER_banco](docs/03-DER_Banco.png)
+
 
 ### **Evento (A)**
 
@@ -115,15 +136,15 @@ eventlab/
 | id             | PK            | Identificador da atividade      |
 | titulo         | CharField     | Nome da atividade               |
 | descricao      | TextField     | Descrição                       |
-| tipo           | CharField     | Tipo (palestra, oficina…)       |
 | horario_inicio | DateTimeField | Início                          |
 | horario_fim    | DateTimeField | Fim                             |
+| tipo           | CharField     | Tipo (palestra, oficina…)       |
 | evento_id      | FK            | Relacionamento com Evento       |
 | responsavel_id | FK            | Relacionamento com Participante |
 
 ---
 
-### **Participante (C)**
+### **Participante "User" (C)**
 
 | Campo   | Tipo       | Descrição                               |
 | ------- | ---------- | --------------------------------------- |
@@ -133,12 +154,22 @@ eventlab/
 | celular | CharField  | Telefone                                |
 | tipo    | CharField  | Perfil (aluno, palestrante, convidado…) |
 
+### **UserEvento "Inscrição" (D)**
+
+| Campo        | Tipo       | Descrição                               |
+| ------------ | ---------- | --------------------------------------- |
+| id           | PK         | Identificador                           |
+| user_id      | FK         | Relacionamento com user (participante)  |
+| evento_id    | Fk         | Relacionamento com evento               |
+|data_inscricao| CharField  | Telefone                                |
+
+
 ---
 
 ## 🔗 Relacionamentos
 
 * **Evento (1) → (N) Atividade**
-* **Evento (N) ↔ (N) Participante**
+* **Evento (N) ↔ (N) Participante (User)**
 * **Atividade (1) → (1) Participante (responsável)**
 
 ### 📐 Representação Textual

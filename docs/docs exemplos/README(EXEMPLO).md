@@ -37,8 +37,8 @@ Diego Martins
 Este projeto implementa uma **API de Gestão de Eventos** voltada para organizar congressos, palestras e workshops.  
 O sistema permite gerenciar **Eventos**, **Atividades** e **Participantes**, com regras de permissão claras:
 
-- **Admin/Staff** → pode criar, editar e excluir eventos e atividades, cadastrar participantes e definir responsáveis.
-- **Participante/Usuário** → pode consultar eventos, visualizar atividades e realizar sua própria inscrição.
+- **Admin** → pode visualizar, criar, editar e excluir eventos e atividades, fazer inscrições e cadastrar participantes e definir responsáveis das atividades.
+- **Participante/Usuário/Palestrante** → pode consultar eventos, conferir a inscrição e visualizar atividades do evento.
 
 Funcionalidades principais:
 
@@ -46,7 +46,7 @@ Funcionalidades principais:
 - **Inscrições:** Vínculo de participantes em eventos (N:N).
 - **Dashboard:** Rota consolidada com dados do evento, atividades e inscritos.
 - **Carga de Dados:** Script automatizado para importação de dados via CSV.
-- **Documentação:** Interface interativa com Swagger e ReDoc.
+- **Documentação:** Interface interativa com Swagger e ReDoc via spetacular.
 
 ---
 
