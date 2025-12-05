@@ -66,10 +66,6 @@
       background-color: #dc3545;
     }
 
-    button.secondary {
-      background-color: #6c757d;
-    }
-
     button.admin {
       background-color: #417690;
     }
@@ -115,7 +111,76 @@
       background: #ffc107;
       color: black;
     }
+
+    .admin-container {
+    display: flex;
+    height: 100vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background-color: #333;
+      color: white;
+      padding: 20px;
+    }
+
+    .content {
+      flex-grow: 1;
+      padding: 20px;
+    }
+
+    .btn-toggle {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    .chart-panel {
+      background-color: #f4f4f4;
+      padding: 20px;
+      border: 1px solid #ddd;
+      margin-bottom: 20px;
+      /* Dica: Você pode adicionar animações aqui depois */
+    }
+
+    .placeholder-grafico {
+      height: 200px;
+      background-color: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-menu {
+      padding: 10px 20px;
+      background-color: #e0e0e0; /* Cinza claro (desativado) */
+      color: #333;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 16px;
+      margin-right: 10px;
+      transition: 0.3s; /* Animação suave na troca de cor */
+    }
+
+    .btn-menu:hover {
+      background-color: #d0d0d0; /* Efeito ao passar o mouse */
+    }
+
+    /* 2. Estilo do Botão ATIVO (Selecionado) */
+    /* Essa classe será adicionada e removida pelo JavaScript */
+    .btn-menu.ativo {
+      background-color: #007bff; /* Azul (cor de destaque) */
+      color: white;
+      font-weight: bold;
+    }
+
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -134,17 +199,29 @@
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <p>Logado com: <strong id="nome-usuario">Visitante</strong></p>
       <div>
+        <button id="toggleBtn" class="btn-toggle">Mostrar Gráfico 📊</button>
         <button class="admin" onclick="abrirAdmin()">⚙️ Painel Admin</button>
         <button class="danger" onclick="logout()">Sair</button>
       </div>
     </div>
     <hr>
 
+    <div style="margin-bottom: 20px;"></div>
+
+        <div id="chartArea" class="card chart-panel" style="margin-bottom: 20px; display: none;">
+            <h3>📊 Estatísticas: Inscritos por Evento</h3>
+            <div style="height: 300px;">
+                <canvas id="graficoEventos"></canvas>
+            </div>
+        </div>
+
     <div style="margin-bottom: 20px;">
-      <button onclick="listarEventos()">📅 Eventos</button>
-      <button class="secondary" onclick="listarAtividades()">🎤 Todas Atividades</button>
-      <button class="secondary" onclick="listarParticipantes()">👥 Todos Participantes</button>
+      <button class="btn-menu ativo" onclick="listarEventos()">📅 Eventos</button>
+      <button class="btn-menu" onclick="listarAtividades()">🎤 Todas Atividades</button>
+      <button class="btn-menu" onclick="listarParticipantes()">👥 Todos Participantes</button>
     </div>
+
+    <input type="text" id="input-busca" onkeyup="filtrarDados()" placeholder="🔍 Digite para pesquisar..." style="margin-bottom: 20px; border: 2px solid #007bff;">
 
     <h2 id="titulo-secao">Eventos</h2>
     <div id="conteudo-lista">Carregando...</div>
@@ -160,6 +237,9 @@
     const userSalvo = localStorage.getItem('user_name');
     if (userSalvo) {
       document.getElementById('nome-usuario').innerText = userSalvo;
+      if (document.getElementById('login-area').classList.contains('hidden')) {
+        carregarGrafico();
+      }
     }
 
     // --- AUTENTICAÇÃO ---
@@ -189,6 +269,7 @@
           document.getElementById('login-area').classList.add('hidden');
           document.getElementById('dashboard-area').classList.remove('hidden');
           listarEventos();
+          carregarGrafico();
         } else {
           status.innerText = "❌ Dados incorretos.";
         }
@@ -196,8 +277,8 @@
     }
 
     function abrirAdmin() {
-      // window.open(ADMIN_URL, '_blank'); // <-- Isso abria em nova aba
-      window.location.href = ADMIN_URL;    // <-- Isso abre na MESMA aba
+      window.open(ADMIN_URL, '_blank'); // <-- Isso abria em nova aba
+      // window.location.href = ADMIN_URL;    // <-- Isso abre na MESMA aba
     }
 
     function logout() {
@@ -226,6 +307,7 @@
     }
 
     async function listarEventos() {
+      document.getElementById('input-busca').value = ""; // <--- Limpa a busca anterior
       document.getElementById('titulo-secao').innerText = "📅 Lista de Eventos";
       const div = document.getElementById('conteudo-lista');
       div.innerHTML = "Carregando...";
@@ -318,6 +400,7 @@
     }
 
     async function listarAtividades() {
+      document.getElementById('input-busca').value = ""; // <--- Limpa a busca anterior
       document.getElementById('titulo-secao').innerText = "🎤 Todas as Atividades";
       const div = document.getElementById('conteudo-lista');
       div.innerHTML = "Carregando...";
@@ -373,6 +456,7 @@
 
     // --- ATUALIZAÇÃO: LISTAR PARTICIPANTES COM DETALHES ---
     async function listarParticipantes() {
+      document.getElementById('input-busca').value = ""; // <--- Limpa a busca anterior
       document.getElementById('titulo-secao').innerText = "👥 Base de Usuários";
       const div = document.getElementById('conteudo-lista');
       div.innerHTML = "Carregando...";
@@ -465,6 +549,124 @@
         divDetalhes.innerHTML = "Erro ao carregar detalhes.";
       }
     }
+
+  // --- FUNÇÃO DE PESQUISA INSTANTÂNEA ---
+    function filtrarDados() {
+        // 1. Pega o que foi digitado e transforma em minúsculo
+        const termo = document.getElementById('input-busca').value.toLowerCase();
+        
+        // 2. Pega todos os cards que estão na tela (Eventos, Atividades ou Participantes)
+        const itens = document.getElementsByClassName('item-lista');
+      
+        // 3. Passa por cada um e esconde/mostra
+        for (let i = 0; i < itens.length; i++) {
+            const item = itens[i];
+            // Pega todo o texto de dentro do card
+            const texto = item.textContent || item.innerText;
+            
+            // Se o texto incluir o termo, mostra. Se não, esconde.
+            if (texto.toLowerCase().indexOf(termo) > -1) {
+                item.style.display = "";
+            } else {
+                item.style.display = "none";
+            }
+        }
+    }
+
+  // Variável global para guardar o gráfico e poder atualizar depois
+    let meuGrafico = null;
+    
+    async function carregarGrafico() {
+        try {
+            // 1. Pega todos os eventos
+            const eventos = await fetchAPI('eventos/');
+            
+            const nomes = [];
+            const totais = [];
+            const cores = [];
+            
+            // 2. Para cada evento, precisamos saber quantos inscritos tem
+            // (Isso pode demorar um pouco se tiver muitos eventos, pois faz várias chamadas)
+            for (let ev of eventos) {
+                const detalhes = await fetchAPI(`eventos/${ev.id}/dashboard/`);
+                nomes.push(ev.nome);
+                
+                // Conta quantos inscritos tem na lista
+                const qtd = detalhes.inscricoes ? detalhes.inscricoes.length : 0;
+                totais.push(qtd);
+                
+                // Gera uma cor aleatória bonitinha para cada barra
+                cores.push(`hsl(${Math.random() * 360}, 70%, 50%)`);
+            }
+            
+            // 3. Desenha o Gráfico
+            const ctx = document.getElementById('graficoEventos').getContext('2d');
+            
+            // Se já existir um gráfico antigo, destrói para não bugar
+            if (meuGrafico) meuGrafico.destroy();
+            
+            meuGrafico = new Chart(ctx, {
+                type: 'bar', // Tipo barra
+                data: {
+                    labels: nomes, // Nomes dos eventos embaixo
+                    datasets: [{
+                        label: 'Nº de Inscritos',
+                        data: totais, // Números verticais
+                        backgroundColor: cores,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } } // Começa do 0 e conta de 1 em 1
+                    }
+                }
+            });
+          
+        } catch (e) {
+            console.error("Erro ao gerar gráfico", e);
+        }
+    }
+
+    const btn = document.getElementById('toggleBtn');
+    const chartArea = document.getElementById('chartArea');
+
+    // GRAFICO
+    btn.addEventListener('click', () => {
+      // Verifica se o gráfico está escondido
+      if (chartArea.style.display === 'none') {
+        // Ação: MOSTRAR
+        chartArea.style.display = 'block';
+        btn.textContent = 'Esconder Gráfico 🚫';
+        btn.style.backgroundColor = '#dc3545'; // Muda cor para vermelho (opcional)
+      } else {
+        // Ação: ESCONDER
+        chartArea.style.display = 'none';
+        btn.textContent = 'Mostrar Gráfico 📊';
+        btn.style.backgroundColor = '#007bff'; // Volta para azul
+      }
+    });
+    
+    // 1. Pega todos os botões que têm a classe .btn-menu
+    const botoes = document.querySelectorAll('.btn-menu');
+
+    // 2. Para cada botão encontrado, adicionamos uma escuta de clique
+    botoes.forEach(botao => {
+        botao.addEventListener('click', function() {
+            
+        // Passo A: Remove a classe 'ativo' de TODOS os botões
+        botoes.forEach(btn => btn.classList.remove('ativo'));
+
+        // Passo B: Adiciona a classe 'ativo' SÓ no botão clicado (this)
+        this.classList.add('ativo');
+
+        // (Opcional) Aqui você colocaria a lógica para trocar o conteúdo da tela
+        console.log("Você clicou em: " + this.textContent);
+        });
+    });
+
   </script>
 </body>
 
