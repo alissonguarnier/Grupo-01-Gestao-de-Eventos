@@ -1,6 +1,9 @@
-# gitignore python
+# gitignore python: https://github.com/github/gitignore/blob/main/Python.gitignore
+
 # Byte-compiled / optimized / DLL files
+*__pycache__/
 __pycache__/
+*.pyc
 *.py[cod]
 *$py.class
 
@@ -103,3 +106,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# ------- Adicionado: -----------
+
+db.sqlite3
