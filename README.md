@@ -1,56 +1,56 @@
-# 📘 EventLab API — Sistema de Gestão de Eventos
+# 📘 Gertão de Eventos - Project API
 
-# 📑 Sumário
-
-1. Visão Geral
-2. Pacotes Utilizados
-3. Estrutura do Projeto
-4. Diagrama de Banco de Dados
-5. Documentação da API
-6. Configuração do Ambiente
-7. Deploy
+[![Python](https://img.shields.io/badge/Python-3.12%2B-blue.svg?logo=python)](https://www.python.org/downloads/)
+[![Django](https://img.shields.io/badge/Django-5.0%2B-green.svg?logo=Django)](https://www.djangoproject.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-003B57.svg?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-# 🎯 Visão Geral
+## Instituições de Fomento e Parceria
 
-A **EventLab API** é um sistema backend para **gestão de eventos**, permitindo organizar:
-
-* **Eventos (A)**
-* **Atividades (B)**
-* **Participantes (C)**
-
-O sistema utiliza autenticação, permissões de acesso e rotas de relacionamento entre entidades.
-
-### Permissões
-
-**Admin/staff**
-
-* Criar, editar e excluir eventos e atividades
-* Cadastrar participantes
-* Definir responsáveis por atividades
-
-**Participante autenticado**
-
-* Consultar seus dados pessoais
-* Visualizar eventos e atividades
-
-**Usuário anônimo**
-
-* Visualizar apenas eventos e atividades públicas
-
-### Funcionalidades Principais
-
-* CRUD completo de **Eventos, Atividades e Participantes**
-* Inscrição de participantes em eventos
-* Definição de responsáveis pelas atividades
-* Relacionamentos entre Evento ↔ Atividade ↔ Participante
-* Dashboard geral do evento (A-B-C)
-* Documentação interativa da API via Swagger e ReDoc
+[![Website IFB](https://img.shields.io/badge/Website-IFB-%23508C3C.svg?labelColor=%23C8102E)](https://www.ifb.edu.br/)  
+ [![Website ihwbr](https://img.shields.io/badge/Website-ihwbr-%23DAA520.svg?labelColor=%232E2E2E)](https://hardware.org.br/)
 
 ---
 
-# 📦 Pacotes Utilizados
+## Orientador
+
+Diego Martins
+
+---
+
+## Sumário
+
+- [Visão Geral](#visão-geral)
+- [Pacotes Utilizados](#pacotes-utilizados)
+- [Estrutura do Projeto](#estrutura-do-projeto)
+- [Diagrama de Banco de Dados](#diagrama-de-banco-de-dados)
+- [Documentação da API](#documentação-da-api)
+- [Configuração do Ambiente](#configuração-do-ambiente)
+- [Deploy](#deploy)
+
+---
+
+## Visão Geral
+
+Este projeto implementa uma **API de Gestão de Eventos** voltada para organizar congressos, palestras e workshops.  
+O sistema permite gerenciar **Eventos**, **Atividades** e **Participantes**, com as regras de permissões:
+
+- **Admin** → pode visualizar, criar, editar e excluir eventos e atividades, fazer inscrições e cadastrar participantes e definir responsáveis das atividades.
+- **Participante/Usuário/Palestrante** → pode consultar eventos, conferir a inscrição e visualizar atividades dos eventos.
+
+Funcionalidades principais:
+
+- **CRUD Completo:** Gestão de Eventos e Atividades.
+- **Inscrições:** Vínculo de participantes em eventos (N:N).
+- **Dashboard:** Rota consolidada com dados do evento, atividades e inscritos.
+- **Carga de Dados:** Script automatizado para importação de dados via CSV.
+- **Documentação:** Interface interativa com Swagger e ReDoc via spetacular.
+
+---
+
+## Pacotes Utilizados
 
 | Pacote                   | Versão | Descrição              |
 | ------------------------ | ------ | ---------------------- |
@@ -61,17 +61,19 @@ O sistema utiliza autenticação, permissões de acesso e rotas de relacionament
 | drf-spectacular-sidecar  | latest | UI Swagger/ReDoc       |
 | django-cors-headers      | latest | Segurança do HTML      |
 
-> A lista completa e as versões exatas estão em **requirements.txt**.
+> **Nota:** Consulte o arquivo `requirements.txt` para a lista completa e versões exatas.
 
 ---
 
-# 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
-```
+```bash
 GRUPO-01-GESTAO-DE-EVENTOS/
 ├── manage.py
 ├── requirements.txt
 ├── README.md
+├── frontend/
+│   └── index.html
 ├── projeto/
 │   ├── settings.py
 │   ├── urls.py
@@ -93,7 +95,7 @@ GRUPO-01-GESTAO-DE-EVENTOS/
 │   ├── views.py
 │   └── ...
 └── docs/
-    ├── management/
+    ├── codigos_diagramas/
     │   ├── DER_banco.pu
     │   └── MER_banco.brM3
     ├── 01-Enunciado.md
@@ -103,18 +105,24 @@ GRUPO-01-GESTAO-DE-EVENTOS/
 
 ```
 
-* **projeto/** → Configurações principais do Django
-* **gestaoEventos/** → Aplicação principal (modelos, views, serializers, routers)
-* **docs/** → Diagramas e arquivos de documentação
+- **projeto/** → configurações principais do Django.
+- **gestaoEventos/** → aplicação principal com modelos, views, serializers e rotas.
+- **docs/** → documentação auxiliar (diagramas, imagens).
 
 ---
 
-# 🗂️ Diagrama de Banco de Dados
-
-## Entidades e Relacionamentos
+## Diagrama de Banco de Dados
+DER:
 
 ![DER_banco](docs/03-DER_Banco.png)
 
+MER:
+
+![MER_banco](docs/04-MER_Banco.png)
+
+# Diagrama ER – DevLab Project API
+
+## Entidades e Relacionamentos
 
 ### **Evento (A)**
 
@@ -168,111 +176,118 @@ GRUPO-01-GESTAO-DE-EVENTOS/
 
 ## 🔗 Relacionamentos
 
-* **Evento (1) → (N) Atividade**
-* **Evento (N) ↔ (N) Participante (User)**
-* **Atividade (1) → (1) Participante (responsável)**
+- **Evento (1) ↔ (N) Atividade**  
+  Um Evento pode ter várias atividades, mas cada atividade pertence a um único evento.
 
-### 📐 Representação Textual
+- **Evento (N) ↔ (N) Participante (User)**  
+  Um evento pode ter vários participantes, e um participante pode inscrever em vários eventos por meio da tabela UserEvento.
 
-```
-Evento (1) ─── (N) Atividade ─── (1) Participante (responsável)
-     │
-     └── (N:N) Participante (inscritos)
-```
+- **Perfil (1) ↔ (1) Participante (User)**  
+  Uma participante tem um perfil, e um perfil pode ser apenas de um participante.
+
+- **Participante (User) (1) ↔ (N) Atividade**  
+  Um Participante pode ser responsável por várias atividades, mas cada atividade pode ter apenas um único resposável.
 
 ---
 
-# 📚 Documentação da API
+## 📐 Representação Visual em Texto
+
+**Entidades principais:**
+
+- **Evento** → agrupa vários eventos.
+- **Atividade** → pertence a um evento, tem um responsável.
+- **User** → pode estar em vários eventos e liderar uma atividade.
+
+Relacionamentos:
+
+- Evento ↔ Atividade → **1:N**
+- Evento ↔ User (participante) → **N:N**
+- Perfil ↔ User (Complemento) → **1:1**
+- Atividade ↔ User (responsável) → **1:N**
+
+---
+
+## Documentação da API
 
 A documentação interativa está disponível em:
 
-* **/api/docs/** → Swagger UI
-* **/api/docs/redoc/** → ReDoc
-* **/api/schema/** → Arquivo OpenAPI
+- `/api/schema/` → Arquivo OpenAPI
+- `/api/docs/` → Swagger UI / spectacular
+- `/api/docs/redoc/` → ReDoc
 
----
+### Endpoints Principais
 
-# 🔍 Endpoints Principais
 
-| Método | Endpoint                            | Descrição                         | Auth        |
-| ------ | ----------------------------------- | --------------------------------- | ----------- |
-| GET    | `/api/eventos/`                     | Lista todos os eventos            | Opcional    |
-| GET    | `/api/eventos/{id}/dashboard/`      | Detalhes completos do evento      | Autenticada |
-| GET    | `/api/atividades/`                  | Lista atividades                  | Opcional    |
-| POST   | `/api/atividades/{id}/responsavel/` | Define responsável pela atividade | Admin       |
-| GET    | `/api/participantes/{id}/`          | Detalhes do participante          | Autenticada |
-| GET    | `/api/eventos/{id}/participantes/`  | Lista de inscritos no evento      | Autenticada |
+| Método | Endpoint                            | Descrição                           | Auth        |
+| ------ | ----------------------------------- | ---------------------------------   | ----------- |
+| GET    | `/api/eventos/`                     | Lista todos os eventos e atividades | Opcional    |
+| GET    | `/api/eventos/{id}/dashboard/`      | Detalhes completos com as inscrições| Opcional    |
+| GET    | `/api/atividades/`                  | Lista atividades                    | Opcional    |
+| GET    | `/api/atividades/{id}/`             | Detalhes da atividade               | Opcional    |
+| GET    | `/api/participantes/{id}/`          | Detalhes do participante            | Opcional    |
+| GET    | `/api/eventos/{id}/participantes/`  | Lista de inscritos no evento        | Opcional    |
 
----
+## Configuração do Ambiente
 
-# ⚙️ Configuração do Ambiente
+1. **Clone o repositório:**
 
-### 1. Clonar o repositório
+   ```bash
+      git clone https://github.com/alissonguarnier/Grupo-01-Gestao-de-Eventos/
+      cd Grupo-01-Gestao-de-Eventos
+   ```
 
-```
-git clone https://github.com/usuario/eventlab.git
-cd eventlab
-```
+1. **Crie um ambiente virtual:**
 
----
+   ```bash
+      python -m venv venv
+      source venv/bin/activate  # Linux/Mac
+      venv\Scripts\activate     # Windows
+   ```
 
-### 2. Criar o ambiente virtual
+2. **Instale as dependências:**
 
-**Linux/Mac:**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-```
-python -m venv venv
-source venv/bin/activate
-```
+3. **Aplique as migrações do banco:**
 
-**Windows:**
+   ```bash
+   # python manage.py makemigrations (usa ou não?)
+   python manage.py migrate 
+   ```
 
-```
-venv\Scripts\activate
-```
+4. **Populando o banco de dados:**
 
----
+   ```bash
+   python manage.py importar_dados
+   ```
 
-### 3. Instalar dependências
+5. **Criando o Super User:**
 
-```
-pip install -r requirements.txt
-```
+   ```bash
+      python manage.py createsuperuser
+   ```  
 
----
+6. **Iniciando o server:**
 
-### 4. Configurar variáveis de ambiente
+   ```bash
+      python manage.py runserver
+   ```  
 
-```
-cp .env.example .env
-```
+## Front-End 
 
----
+### Abrindo e utilizando o front end:
 
-### 5. Executar migrações e iniciar o servidor
+1. **instale a extenção [Live server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) no Visual Studio**;
 
-```
-python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver
-```
+2. **Localize o arquivo index.html no caminho abaixo;**
+      ```bash
+      GRUPO-01-GESTAO-DE-EVENTOS/
+      └── frontend/
+          └── index.html
+      ```
 
----
+3. **Abra o arquivo com o "Open with Live Server";**
 
-# 🚀 Deploy (Opcional)
-
-**Plataformas recomendadas:** Render · Railway · AWS
-
-### Procfile
-
-```
-web: gunicorn config.wsgi:application --log-file -
-```
-
-### Comandos adicionais
-
-```
-python manage.py migrate
-python manage.py collectstatic
-```
-
+4. **Faça o login com o Super User criado.**

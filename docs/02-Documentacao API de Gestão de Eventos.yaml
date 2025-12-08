@@ -1,0 +1,1183 @@
+openapi: 3.0.3
+info:
+  title: API de Gestão de Eventos
+  version: 1.0.0
+  description: API para controle de eventos, atividades e inscrições.
+paths:
+  /api/atividades/:
+    get:
+      operationId: atividades_list
+      description: |-
+        Endpoint para gerenciar Atividades.
+        Rota: /api/atividades/
+      tags:
+      - atividades
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Atividade'
+          description: ''
+    post:
+      operationId: atividades_create
+      description: |-
+        Endpoint para gerenciar Atividades.
+        Rota: /api/atividades/
+      tags:
+      - atividades
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Atividade'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Atividade'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Atividade'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Atividade'
+          description: ''
+  /api/atividades/{id}/:
+    get:
+      operationId: atividades_retrieve
+      description: |-
+        Endpoint para gerenciar Atividades.
+        Rota: /api/atividades/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Um valor inteiro único que identifica este atividade.
+        required: true
+      tags:
+      - atividades
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Atividade'
+          description: ''
+    put:
+      operationId: atividades_update
+      description: |-
+        Endpoint para gerenciar Atividades.
+        Rota: /api/atividades/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Um valor inteiro único que identifica este atividade.
+        required: true
+      tags:
+      - atividades
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Atividade'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Atividade'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Atividade'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Atividade'
+          description: ''
+    patch:
+      operationId: atividades_partial_update
+      description: |-
+        Endpoint para gerenciar Atividades.
+        Rota: /api/atividades/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Um valor inteiro único que identifica este atividade.
+        required: true
+      tags:
+      - atividades
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAtividade'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAtividade'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAtividade'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Atividade'
+          description: ''
+    delete:
+      operationId: atividades_destroy
+      description: |-
+        Endpoint para gerenciar Atividades.
+        Rota: /api/atividades/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Um valor inteiro único que identifica este atividade.
+        required: true
+      tags:
+      - atividades
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/atividades/{id}/responsavel/:
+    patch:
+      operationId: atividades_responsavel_partial_update
+      description: Define um responsável pela atividade via ID do usuário
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Um valor inteiro único que identifica este atividade.
+        required: true
+      tags:
+      - atividades
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAtividade'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAtividade'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAtividade'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Atividade'
+          description: ''
+  /api/auth/token/:
+    post:
+      operationId: auth_token_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+          description: ''
+  /api/eventos/:
+    get:
+      operationId: eventos_list
+      description: |-
+        Endpoint principal de Eventos.
+        Rota: /api/eventos/
+      parameters:
+      - in: query
+        name: data_inicio
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: local
+        schema:
+          type: string
+      tags:
+      - eventos
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Evento'
+          description: ''
+    post:
+      operationId: eventos_create
+      description: |-
+        Endpoint principal de Eventos.
+        Rota: /api/eventos/
+      tags:
+      - eventos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Evento'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Evento'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Evento'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evento'
+          description: ''
+  /api/eventos/{id}/:
+    get:
+      operationId: eventos_retrieve
+      description: |-
+        Endpoint principal de Eventos.
+        Rota: /api/eventos/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Um valor inteiro único que identifica este evento.
+        required: true
+      tags:
+      - eventos
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evento'
+          description: ''
+    put:
+      operationId: eventos_update
+      description: |-
+        Endpoint principal de Eventos.
+        Rota: /api/eventos/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Um valor inteiro único que identifica este evento.
+        required: true
+      tags:
+      - eventos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Evento'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Evento'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Evento'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evento'
+          description: ''
+    patch:
+      operationId: eventos_partial_update
+      description: |-
+        Endpoint principal de Eventos.
+        Rota: /api/eventos/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Um valor inteiro único que identifica este evento.
+        required: true
+      tags:
+      - eventos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEvento'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEvento'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEvento'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evento'
+          description: ''
+    delete:
+      operationId: eventos_destroy
+      description: |-
+        Endpoint principal de Eventos.
+        Rota: /api/eventos/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Um valor inteiro único que identifica este evento.
+        required: true
+      tags:
+      - eventos
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/eventos/{id}/atividades/:
+    get:
+      operationId: eventos_atividades_retrieve
+      description: Lista apenas as atividades de um evento específico
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Um valor inteiro único que identifica este evento.
+        required: true
+      tags:
+      - eventos
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evento'
+          description: ''
+  /api/eventos/{id}/dashboard/:
+    get:
+      operationId: eventos_dashboard_retrieve
+      description: Retorna uma visão completa do evento (Atividades + Participantes)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Um valor inteiro único que identifica este evento.
+        required: true
+      tags:
+      - eventos
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evento'
+          description: ''
+  /api/eventos/{id}/participantes/:
+    get:
+      operationId: eventos_participantes_retrieve
+      description: |-
+        GET: Lista participantes do evento.
+        POST: Inscreve o usuário logado no evento.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Um valor inteiro único que identifica este evento.
+        required: true
+      tags:
+      - eventos
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evento'
+          description: ''
+    post:
+      operationId: eventos_participantes_create
+      description: |-
+        GET: Lista participantes do evento.
+        POST: Inscreve o usuário logado no evento.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Um valor inteiro único que identifica este evento.
+        required: true
+      tags:
+      - eventos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Evento'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Evento'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Evento'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evento'
+          description: ''
+  /api/participantes/:
+    get:
+      operationId: participantes_list
+      description: |-
+        Endpoint para gerenciar participantes (Users + Perfil).
+        Rota: /api/participantes/
+      tags:
+      - participantes
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+          description: ''
+    post:
+      operationId: participantes_create
+      description: |-
+        Endpoint para gerenciar participantes (Users + Perfil).
+        Rota: /api/participantes/
+      tags:
+      - participantes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/participantes/{id}/:
+    get:
+      operationId: participantes_retrieve
+      description: |-
+        Endpoint para gerenciar participantes (Users + Perfil).
+        Rota: /api/participantes/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Um valor inteiro único que identifica este usuário.
+        required: true
+      tags:
+      - participantes
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: participantes_update
+      description: |-
+        Endpoint para gerenciar participantes (Users + Perfil).
+        Rota: /api/participantes/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Um valor inteiro único que identifica este usuário.
+        required: true
+      tags:
+      - participantes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: participantes_partial_update
+      description: |-
+        Endpoint para gerenciar participantes (Users + Perfil).
+        Rota: /api/participantes/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Um valor inteiro único que identifica este usuário.
+        required: true
+      tags:
+      - participantes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: participantes_destroy
+      description: |-
+        Endpoint para gerenciar participantes (Users + Perfil).
+        Rota: /api/participantes/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Um valor inteiro único que identifica este usuário.
+        required: true
+      tags:
+      - participantes
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/schema/:
+    get:
+      operationId: schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - ug
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - schema
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+components:
+  schemas:
+    Atividade:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        titulo:
+          type: string
+          maxLength: 255
+        descricao:
+          type: string
+        horario_inicio:
+          type: string
+          format: date-time
+        horario_fim:
+          type: string
+          format: date-time
+        tipo:
+          $ref: '#/components/schemas/AtividadeTipoEnum'
+        evento:
+          type: integer
+        evento_titulo:
+          type: string
+          readOnly: true
+        responsavel:
+          type: integer
+          nullable: true
+        responsavel_nome:
+          type: string
+          title: Usuário
+          description: Obrigatório. 150 caracteres ou menos. Letras, números e @/./+/-/_
+            apenas.
+          readOnly: true
+      required:
+      - descricao
+      - evento
+      - evento_titulo
+      - horario_fim
+      - horario_inicio
+      - id
+      - responsavel_nome
+      - tipo
+      - titulo
+    AtividadeTipoEnum:
+      enum:
+      - W
+      - P
+      - O
+      - X
+      type: string
+      description: |-
+        * `W` - Workshop
+        * `P` - Palestra
+        * `O` - Oficina
+        * `X` - Outros
+    AuthToken:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+          title: Nome do usuário
+        password:
+          type: string
+          writeOnly: true
+          title: Senha
+        token:
+          type: string
+          readOnly: true
+      required:
+      - password
+      - token
+      - username
+    Evento:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nome:
+          type: string
+          maxLength: 255
+        descricao:
+          type: string
+        data_inicio:
+          type: string
+          format: date-time
+        data_fim:
+          type: string
+          format: date-time
+        local:
+          type: string
+          maxLength: 255
+        atividades:
+          type: array
+          items:
+            $ref: '#/components/schemas/Atividade'
+          readOnly: true
+      required:
+      - atividades
+      - data_fim
+      - data_inicio
+      - descricao
+      - id
+      - local
+      - nome
+    PatchedAtividade:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        titulo:
+          type: string
+          maxLength: 255
+        descricao:
+          type: string
+        horario_inicio:
+          type: string
+          format: date-time
+        horario_fim:
+          type: string
+          format: date-time
+        tipo:
+          $ref: '#/components/schemas/AtividadeTipoEnum'
+        evento:
+          type: integer
+        evento_titulo:
+          type: string
+          readOnly: true
+        responsavel:
+          type: integer
+          nullable: true
+        responsavel_nome:
+          type: string
+          title: Usuário
+          description: Obrigatório. 150 caracteres ou menos. Letras, números e @/./+/-/_
+            apenas.
+          readOnly: true
+    PatchedEvento:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nome:
+          type: string
+          maxLength: 255
+        descricao:
+          type: string
+        data_inicio:
+          type: string
+          format: date-time
+        data_fim:
+          type: string
+          format: date-time
+        local:
+          type: string
+          maxLength: 255
+        atividades:
+          type: array
+          items:
+            $ref: '#/components/schemas/Atividade'
+          readOnly: true
+    PatchedUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          title: Usuário
+          description: Obrigatório. 150 caracteres ou menos. Letras, números e @/./+/-/_
+            apenas.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Endereço de email
+          maxLength: 254
+        first_name:
+          type: string
+          title: Primeiro nome
+          maxLength: 150
+        last_name:
+          type: string
+          title: Último nome
+          maxLength: 150
+        perfil:
+          $ref: '#/components/schemas/Perfil'
+        inscricoes:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserEventos'
+          readOnly: true
+        atividades_lideradas:
+          type: array
+          items:
+            $ref: '#/components/schemas/Atividade'
+          readOnly: true
+    Perfil:
+      type: object
+      properties:
+        celular:
+          type: string
+          nullable: true
+          maxLength: 20
+        tipo:
+          $ref: '#/components/schemas/PerfilTipoEnum'
+    PerfilTipoEnum:
+      enum:
+      - P
+      - C
+      - O
+      - X
+      type: string
+      description: |-
+        * `P` - Participante
+        * `C` - Convidado
+        * `O` - Organizador
+        * `X` - Outros
+    StatusEnum:
+      enum:
+      - C
+      - P
+      - X
+      type: string
+      description: |-
+        * `C` - Confirmado
+        * `P` - Pendente
+        * `X` - Outros
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          title: Usuário
+          description: Obrigatório. 150 caracteres ou menos. Letras, números e @/./+/-/_
+            apenas.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Endereço de email
+          maxLength: 254
+        first_name:
+          type: string
+          title: Primeiro nome
+          maxLength: 150
+        last_name:
+          type: string
+          title: Último nome
+          maxLength: 150
+        perfil:
+          $ref: '#/components/schemas/Perfil'
+        inscricoes:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserEventos'
+          readOnly: true
+        atividades_lideradas:
+          type: array
+          items:
+            $ref: '#/components/schemas/Atividade'
+          readOnly: true
+      required:
+      - atividades_lideradas
+      - id
+      - inscricoes
+      - perfil
+      - username
+    UserEventos:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+        user_nome:
+          type: string
+          title: Usuário
+          description: Obrigatório. 150 caracteres ou menos. Letras, números e @/./+/-/_
+            apenas.
+          readOnly: true
+        evento:
+          type: integer
+        evento_nome:
+          type: string
+          readOnly: true
+        data_inscricao:
+          type: string
+          format: date-time
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+      required:
+      - data_inscricao
+      - evento
+      - evento_nome
+      - id
+      - user
+      - user_nome
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
