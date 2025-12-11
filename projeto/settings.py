@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -43,7 +44,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_spectacular',
     'gestaoEventos',
-
+    'admin_interface',
+    'colorfield',
 ]
 
 MIDDLEWARE = [
@@ -57,12 +59,15 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+X_FRAME_OPTIONS = "SAMEORIGIN"              # Permite usar modais em vez de janelas pop-up.
+SILENCED_SYSTEM_CHECKS = ["security.W019"]  # ignora mensagens de aviso redundantes
+
 ROOT_URLCONF = 'projeto.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'tamplates'], # informando onde tem o tamplate
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

@@ -60,6 +60,7 @@ Funcionalidades principais:
 | drf-spectacular          | latest | Documentação OpenAPI   |
 | drf-spectacular-sidecar  | latest | UI Swagger/ReDoc       |
 | django-cors-headers      | latest | Segurança do HTML      |
+| django-admin-interface   | latest | Mudar visual do Admin  |
 
 > **Nota:** Consulte o arquivo `requirements.txt` para a lista completa e versões exatas.
 

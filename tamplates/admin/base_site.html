@@ -1,0 +1,26 @@
+{% extends "admin/base.html" %}
+
+{% block title %}
+    {{ title }} | {{ site_title|default:_('Django site admin') }}
+{% endblock %}
+
+{% block branding %}
+    <h1 id="site-name">
+        <a href="{% url 'admin:index' %}">
+            <img src="/static/img/logo_eventlab.png" height="40px" />
+            Gestão de Eventos
+        </a>
+    </h1>
+{% endblock %}
+
+{% block extrastyle %}
+    <style>
+        #header {
+            background: #2c3e50; /* Cor azul escuro/banco */
+            color: #ffffff;
+        }
+        .module h2, .module caption, .inline-group h2 {
+            background: #34495e;
+        }
+    </style>
+{% endblock %}
