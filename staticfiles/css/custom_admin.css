@@ -1,0 +1,7 @@
+/* Ajusta o tamanho da logo APENAS na tela de login */
+.login-logo img {
+  max-width: 150px;
+  /* Mude esse valor para o tamanho que quiser (ex: 100px, 200px) */
+  height: auto;
+  /* Mantém a proporção correta */
+}

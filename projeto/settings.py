@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -124,6 +125,14 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / "static", 
+]
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -163,3 +172,81 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 # Sessão expira sempre que fecha a aba
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+JAZZMIN_SETTINGS = {
+    "copyright": "IFB e IHWBR",
+
+    "topmenu_links": [
+      {"name": "SUPORTE", "url": "https://wa.me/5561999356975?text=Ol%C3%A1%2C%20preciso%20de%20suporte%20para%20o%20sistema%20EventLab.", "new_window": True},
+      {"name": "IFB", "url": "https://www.ifb.edu.br/", "new_window": True},
+      {"name": "IHWBR", "url": "https://hardware.org.br/", "new_window": True},
+    ],
+
+    "show_ui_builder": False,
+    
+    # Logo a ser usado para o seu site, deve estar presente nos arquivos estáticos
+    "site_logo": "img/site_logo.png", 
+    
+    # Classes CSS aplicadas ao logo
+    "site_logo_classes": "img-fluid", # 'img-fluid' é geralmente melhor que 'img-circle' para logos retangulares
+
+    # (Opcional) Logo para a tela de login
+    "login_logo": "img/logo.png", 
+    "custom_css": "css/custom_admin.css",
+    "welcome_sign": "Bem-vindo ao Painel de Admin do EventLab!",
+
+    # Outras configurações que você já tem ou quer adicionar:
+    "site_title": "EventLab Admin",
+    "site_header": "EventLab",
+    # ... (outras configurações)
+    #"site_logo_classes": "img-circle",
+
+    "icons": {
+        # Ícones para os Modelos específicos (as tabelas)
+        "auth.user": "fas fa-user-shield",
+        "auth.group": "fas fa-users",
+        
+        # Abas com os nomes conforme seu models.py
+        "gestaoEventos.Atividade": "fas fa-list-alt",
+        "gestaoEventos.UserEventos": "fas fa-pen",
+        "gestaoEventos.Evento": "fas fa-calendar",
+        "gestaoEventos.Perfil": "fas fa-user-tag",
+
+        # icone do token
+        "authtoken.TokenProxy": "fas fa-key",
+
+    },
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-gray",
+    "accent": "accent-lightblue",
+    "navbar": "navbar-white navbar-light",
+    "no_navbar_border": False,
+    "navbar_fixed": True,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-info",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": True,
+    "sidebar_nav_legacy_style": True,
+    "sidebar_nav_flat_style": False,
+    "theme": "journal",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-outline-primary",
+        "secondary": "btn-outline-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    },
+    "actions_sticky_top": False
+}

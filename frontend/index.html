@@ -113,8 +113,8 @@
     }
 
     .admin-container {
-    display: flex;
-    height: 100vh;
+      display: flex;
+      height: 100vh;
     }
 
     .sidebar {
@@ -157,35 +157,38 @@
 
     .btn-menu {
       padding: 10px 20px;
-      background-color: #e0e0e0; /* Cinza claro (desativado) */
+      background-color: #e0e0e0;
+      /* Cinza claro (desativado) */
       color: #333;
       border: none;
       cursor: pointer;
       border-radius: 5px;
       font-size: 16px;
       margin-right: 10px;
-      transition: 0.3s; /* Animação suave na troca de cor */
+      transition: 0.3s;
+      /* Animação suave na troca de cor */
     }
 
     .btn-menu:hover {
-      background-color: #d0d0d0; /* Efeito ao passar o mouse */
+      background-color: #d0d0d0;
+      /* Efeito ao passar o mouse */
     }
 
     /* 2. Estilo do Botão ATIVO (Selecionado) */
     /* Essa classe será adicionada e removida pelo JavaScript */
     .btn-menu.ativo {
-      background-color: #007bff; /* Azul (cor de destaque) */
+      background-color: #007bff;
+      /* Azul (cor de destaque) */
       color: white;
       font-weight: bold;
     }
-
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
-  <h1>🚀 EventLab Dashboard</h1>
+  <h1>🚀 EventLab Dashboard - Participantes</h1>
 
   <div class="card" id="login-area">
     <h2>🔐 Acesso Restrito</h2>
@@ -208,12 +211,12 @@
 
     <div style="margin-bottom: 20px;"></div>
 
-        <div id="chartArea" class="card chart-panel" style="margin-bottom: 20px; display: none;">
-            <h3>📊 Estatísticas: Inscritos por Evento</h3>
-            <div style="height: 300px;">
-                <canvas id="graficoEventos"></canvas>
-            </div>
-        </div>
+    <div id="chartArea" class="card chart-panel" style="margin-bottom: 20px; display: none;">
+      <h3>📊 Estatísticas: Inscritos por Evento</h3>
+      <div style="height: 300px;">
+        <canvas id="graficoEventos"></canvas>
+      </div>
+    </div>
 
     <div style="margin-bottom: 20px;">
       <button class="btn-menu ativo" onclick="listarEventos()">📅 Eventos</button>
@@ -221,7 +224,8 @@
       <button class="btn-menu" onclick="listarParticipantes()">👥 Todos Participantes</button>
     </div>
 
-    <input type="text" id="input-busca" onkeyup="filtrarDados()" placeholder="🔍 Digite para pesquisar..." style="margin-bottom: 20px; border: 2px solid #007bff;">
+    <input type="text" id="input-busca" onkeyup="filtrarDados()" placeholder="🔍 Digite para pesquisar..."
+      style="margin-bottom: 20px; border: 2px solid #007bff;">
 
     <h2 id="titulo-secao">Eventos</h2>
     <div id="conteudo-lista">Carregando...</div>
@@ -550,84 +554,84 @@
       }
     }
 
-  // --- FUNÇÃO DE PESQUISA INSTANTÂNEA ---
+    // --- FUNÇÃO DE PESQUISA INSTANTÂNEA ---
     function filtrarDados() {
-        // 1. Pega o que foi digitado e transforma em minúsculo
-        const termo = document.getElementById('input-busca').value.toLowerCase();
-        
-        // 2. Pega todos os cards que estão na tela (Eventos, Atividades ou Participantes)
-        const itens = document.getElementsByClassName('item-lista');
-      
-        // 3. Passa por cada um e esconde/mostra
-        for (let i = 0; i < itens.length; i++) {
-            const item = itens[i];
-            // Pega todo o texto de dentro do card
-            const texto = item.textContent || item.innerText;
-            
-            // Se o texto incluir o termo, mostra. Se não, esconde.
-            if (texto.toLowerCase().indexOf(termo) > -1) {
-                item.style.display = "";
-            } else {
-                item.style.display = "none";
-            }
+      // 1. Pega o que foi digitado e transforma em minúsculo
+      const termo = document.getElementById('input-busca').value.toLowerCase();
+
+      // 2. Pega todos os cards que estão na tela (Eventos, Atividades ou Participantes)
+      const itens = document.getElementsByClassName('item-lista');
+
+      // 3. Passa por cada um e esconde/mostra
+      for (let i = 0; i < itens.length; i++) {
+        const item = itens[i];
+        // Pega todo o texto de dentro do card
+        const texto = item.textContent || item.innerText;
+
+        // Se o texto incluir o termo, mostra. Se não, esconde.
+        if (texto.toLowerCase().indexOf(termo) > -1) {
+          item.style.display = "";
+        } else {
+          item.style.display = "none";
         }
+      }
     }
 
-  // Variável global para guardar o gráfico e poder atualizar depois
+    // Variável global para guardar o gráfico e poder atualizar depois
     let meuGrafico = null;
-    
+
     async function carregarGrafico() {
-        try {
-            // 1. Pega todos os eventos
-            const eventos = await fetchAPI('eventos/');
-            
-            const nomes = [];
-            const totais = [];
-            const cores = [];
-            
-            // 2. Para cada evento, precisamos saber quantos inscritos tem
-            // (Isso pode demorar um pouco se tiver muitos eventos, pois faz várias chamadas)
-            for (let ev of eventos) {
-                const detalhes = await fetchAPI(`eventos/${ev.id}/dashboard/`);
-                nomes.push(ev.nome);
-                
-                // Conta quantos inscritos tem na lista
-                const qtd = detalhes.inscricoes ? detalhes.inscricoes.length : 0;
-                totais.push(qtd);
-                
-                // Gera uma cor aleatória bonitinha para cada barra
-                cores.push(`hsl(${Math.random() * 360}, 70%, 50%)`);
-            }
-            
-            // 3. Desenha o Gráfico
-            const ctx = document.getElementById('graficoEventos').getContext('2d');
-            
-            // Se já existir um gráfico antigo, destrói para não bugar
-            if (meuGrafico) meuGrafico.destroy();
-            
-            meuGrafico = new Chart(ctx, {
-                type: 'bar', // Tipo barra
-                data: {
-                    labels: nomes, // Nomes dos eventos embaixo
-                    datasets: [{
-                        label: 'Nº de Inscritos',
-                        data: totais, // Números verticais
-                        backgroundColor: cores,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1 } } // Começa do 0 e conta de 1 em 1
-                    }
-                }
-            });
-          
-        } catch (e) {
-            console.error("Erro ao gerar gráfico", e);
+      try {
+        // 1. Pega todos os eventos
+        const eventos = await fetchAPI('eventos/');
+
+        const nomes = [];
+        const totais = [];
+        const cores = [];
+
+        // 2. Para cada evento, precisamos saber quantos inscritos tem
+        // (Isso pode demorar um pouco se tiver muitos eventos, pois faz várias chamadas)
+        for (let ev of eventos) {
+          const detalhes = await fetchAPI(`eventos/${ev.id}/dashboard/`);
+          nomes.push(ev.nome);
+
+          // Conta quantos inscritos tem na lista
+          const qtd = detalhes.inscricoes ? detalhes.inscricoes.length : 0;
+          totais.push(qtd);
+
+          // Gera uma cor aleatória bonitinha para cada barra
+          cores.push(`hsl(${Math.random() * 360}, 70%, 50%)`);
         }
+
+        // 3. Desenha o Gráfico
+        const ctx = document.getElementById('graficoEventos').getContext('2d');
+
+        // Se já existir um gráfico antigo, destrói para não bugar
+        if (meuGrafico) meuGrafico.destroy();
+
+        meuGrafico = new Chart(ctx, {
+          type: 'bar', // Tipo barra
+          data: {
+            labels: nomes, // Nomes dos eventos embaixo
+            datasets: [{
+              label: 'Nº de Inscritos',
+              data: totais, // Números verticais
+              backgroundColor: cores,
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: { beginAtZero: true, ticks: { stepSize: 1 } } // Começa do 0 e conta de 1 em 1
+            }
+          }
+        });
+
+      } catch (e) {
+        console.error("Erro ao gerar gráfico", e);
+      }
     }
 
     const btn = document.getElementById('toggleBtn');
@@ -648,14 +652,14 @@
         btn.style.backgroundColor = '#007bff'; // Volta para azul
       }
     });
-    
+
     // 1. Pega todos os botões que têm a classe .btn-menu
     const botoes = document.querySelectorAll('.btn-menu');
 
     // 2. Para cada botão encontrado, adicionamos uma escuta de clique
     botoes.forEach(botao => {
-        botao.addEventListener('click', function() {
-            
+      botao.addEventListener('click', function () {
+
         // Passo A: Remove a classe 'ativo' de TODOS os botões
         botoes.forEach(btn => btn.classList.remove('ativo'));
 
@@ -664,7 +668,7 @@
 
         // (Opcional) Aqui você colocaria a lógica para trocar o conteúdo da tela
         console.log("Você clicou em: " + this.textContent);
-        });
+      });
     });
 
   </script>

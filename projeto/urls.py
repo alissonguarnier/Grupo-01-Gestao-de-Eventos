@@ -26,7 +26,7 @@ def admin_logout_login(request):
     2. Redireciona para a tela de login limpa.
     """
     logout(request) 
-    return redirect('/admin/login/')
+    return redirect('/admin/login/?next=/admin')
 # ---------------------
 
 # Configuração do Router
@@ -36,9 +36,9 @@ router.register(r'atividades', AtividadeViewSet, basename='atividade')
 router.register(r'participantes', UserViewSet, basename='participante')
 
 # --- PERSONALIZAÇÃO DO ADMIN ---
-admin.site.site_header = "Administração EventLab"  # Texto no topo do Login e da Dashboard
+admin.site.site_header = "Admin EventLab"  # Texto no topo do Login e da Dashboard
 admin.site.site_title = "EventLab Admin"           # Texto na aba do navegador
-admin.site.index_title = "Gestão de Eventos - Projeto Integrador"       # Texto na lista de apps (Home do Admin)
+admin.site.index_title = "Eventlab"       # Texto na lista de apps (Home do Admin)
 
 # -------------------------------
 
