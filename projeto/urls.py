@@ -12,7 +12,9 @@ from drf_spectacular.views import (
 )
 
 # Importações das suas Views (Use os nomes do seu projeto)
-from gestaoEventos.views import EventoViewSet, AtividadeViewSet, UserViewSet
+from gestaoEventos.views import (
+EventoViewSet, AtividadeViewSet, UserViewSet,
+relatorio_eventos, relatorio_atividades, relatorio_participantes, relatorio_inscricoes, relatorio_grupos_geral) 
 
 # --- FORÇAR O LOGIN ---
 from django.contrib.auth import logout
@@ -64,4 +66,12 @@ urlpatterns = [
 
     # 3. Rota visual REDOC (Uma interface alternativa mais limpa)
     path('api/docs/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+
+    # Rotas dos relatórios:
+    path('relatorios/eventos/', relatorio_eventos, name='relatorio_eventos'),
+    path('relatorios/atividades/', relatorio_atividades, name='relatorio_atividades'),
+    path('relatorios/participantes/', relatorio_participantes, name='relatorio_participantes'),
+    path('relatorios/participantes/', relatorio_participantes, name='relatorio_participantes'),
+    path('relatorios/inscricoes/', relatorio_inscricoes, name='relatorio_inscricoes'),
+    path('relatorios/grupos/geral/', relatorio_grupos_geral, name='relatorio_grupos_geral'),
 ]

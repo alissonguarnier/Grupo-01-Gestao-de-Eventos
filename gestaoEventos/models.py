@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User # Supondo o uso do User padrão do Django
+from django.contrib.auth.models import User, Group # Supondo o uso do User padrão do Django
+
 
 # 1. Tabela Users (Implícita ou Customizada)
 # User padrão do Django, não precisa definir esta classe.
@@ -18,6 +19,49 @@ class Perfil(models.Model):
     tipo = models.CharField(max_length=1, choices=tipos_usuario, default='P')
     # O relacionamento com Eventos N:N não é colocado aqui, e sim na UserEventos.
 
+    # ------ Grupo de acordo com o tipo ---------
+    @property
+    def is_grupo_participante(self):
+        # Retorna True se for P, C ou X
+        return self.tipo in ['P', 'C', 'X']
+
+    @property
+    def is_grupo_staff(self):
+        # Retorna True se for O
+        return self.tipo == 'O'
+    
+    # ---------------------------
+    # Add automático nos grupos e cria o grupo se não tiver:
+    # ---------------------------
+
+    def save(self, *args, **kwargs):
+        # 1. Salva os dados do Perfil primeiro
+        super().save(*args, **kwargs)
+
+        # 2. Define os nomes dos grupos (certificar que eles existem no Admin)
+        grupo_participantes, _ = Group.objects.get_or_create(name='Participantes')
+        grupo_staff, _ = Group.objects.get_or_create(name='Staff')
+
+        # 3. Lógica para Adicionar/Remover baseada no tipo
+        if self.is_grupo_participante:
+            self.user.groups.add(grupo_participantes)
+            self.user.groups.remove(grupo_staff) # Remove do outro para evitar conflito
+            
+        elif self.is_grupo_staff:
+            self.user.groups.add(grupo_staff)
+            self.user.groups.remove(grupo_participantes)
+            
+            # Opcional: Dar status de is_staff no User do Django se for Staff
+            self.user.is_staff = True
+            self.user.save()
+        
+        else:
+            # Se não for nenhum (caso adicione outros tipos no futuro), limpa tudo
+            self.user.groups.remove(grupo_participantes)
+            self.user.groups.remove(grupo_staff)
+
+
+
 # 3. Tabela Eventos
 class Evento(models.Model):
     # Id (PK) é automático
@@ -30,6 +74,30 @@ class Evento(models.Model):
     # Relação N:N com User via UserEventos (through model)
     participantes = models.ManyToManyField(User, through='UserEventos', related_name='eventos_inscritos') 
     
+    @property
+    def carga_horaria_total(self):
+        """
+        Calcula a duração total somando (fim - inicio) de todas as atividades vinculadas.
+        Retorna o valor em horas (arredondado).
+        """
+        total_segundos = 0
+        
+        # Pega todas as atividades desse evento
+        for atividade in self.atividades.all():
+            # Cria objetos dummy de data para poder subtrair os horários (que são TimeField)
+            # Se seus campos forem DateTimeField, pode subtrair direto: atividade.horario_fim - atividade.horario_inicio
+            
+            # SUPONDO QUE SEJAM DateTimeField (o mais comum e recomendado):
+            if atividade.horario_inicio and atividade.horario_fim:
+                diff = atividade.horario_fim - atividade.horario_inicio
+                total_segundos += diff.total_seconds()
+
+        # Converte segundos para horas
+        horas = total_segundos / 3600
+        
+        # Retorna inteiro (ex: 4) ou com 1 casa decimal (ex: 4.5) se preferir
+        return round(horas)
+
     def __str__(self):
         return self.nome
 

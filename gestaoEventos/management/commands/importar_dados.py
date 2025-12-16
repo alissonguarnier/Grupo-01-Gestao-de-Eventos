@@ -23,14 +23,56 @@ class Command(BaseCommand):
                     if len(row) < 6: continue # Pula linhas incompletas
                     username, password, email, nome, tipo, celular = row
                     
-                    if not User.objects.filter(username=username).exists():
+                    # se eu quero criar apenas os que não tem no banco:
+
+                    '''if not User.objects.filter(username=username).exists():
                         user = User.objects.create_user(username=username, email=email, password=password)
                         user.first_name = nome.split()[0]
                         user.save()
                         Perfil.objects.create(user=user, tipo=tipo, celular=celular)
+                        self.stdout.write(self.style.SUCCESS(f'Usuário criado: {username}'))'''
+
+                    # Se quero verificar se teve auteração para apenas modificar:
+
+                    # --- INÍCIO DA VERIFICAÇÃO ---
+                    
+                    # 1. Busca ou Cria o Usuário
+                    # O 'defaults' serve para preencher o email apenas se for criar um novo
+                    user, created_user = User.objects.get_or_create(
+                        username=username,
+                        defaults={'email': email}
+                    )
+
+                    # Se acabou de ser criado, define a senha e o nome
+                    if created_user:
+                        user.set_password(password)
+                        user.first_name = nome.split()[0]
+                        user.save()
+
+                    # 2. Busca ou Cria o Perfil ligado a esse usuário
+                    # (Note que não passamos 'defaults' aqui, pois queremos atualizar os dados abaixo sempre)
+                    perfil, created_perfil = Perfil.objects.get_or_create(user=user)
+
+                    # 3. Atualiza os dados do perfil (Tipo e Celular)
+                    # Isso garante que se você mudou o tipo no CSV, ele atualiza no banco
+                    perfil.tipo = tipo
+                    perfil.celular = celular
+                    
+                    # 4. Salva o Perfil
+                    # AO CHAMAR O SAVE AQUI, SUA LÓGICA DE GRUPOS NO MODELS.PY SERÁ EXECUTADA
+                    perfil.save()
+
+                    if created_user:
                         self.stdout.write(self.style.SUCCESS(f'Usuário criado: {username}'))
+                    else:
+                        self.stdout.write(self.style.SUCCESS(f'Usuário atualizado: {username}'))
+                    
+                    # --- FIM DA MUDANÇA ---                    
+
+
         else:
             self.stdout.write(self.style.WARNING('Arquivo usuarios.csv não encontrado.'))
+
 
         # -----------------------------------------------------------
         # 2. Importar Eventos
@@ -51,6 +93,7 @@ class Command(BaseCommand):
                         self.stdout.write(self.style.SUCCESS(f'Evento criado: {nome}'))
         else:
             self.stdout.write(self.style.WARNING('Arquivo eventos.csv não encontrado.'))
+
 
         # -----------------------------------------------------------
         # 3. Importar Atividades
@@ -79,8 +122,9 @@ class Command(BaseCommand):
                     except Exception as e:
                         self.stdout.write(self.style.ERROR(f'Erro na atividade {titulo}: {e}'))
 
+
         # -----------------------------------------------------------
-        # 4. Importar Inscrições (UserEventos) - NOVO!
+        # 4. Importar Inscrições (UserEventos) 
         # -----------------------------------------------------------
         caminho_inscricoes = os.path.join(base_path, 'inscricoes.csv')
         if os.path.exists(caminho_inscricoes):

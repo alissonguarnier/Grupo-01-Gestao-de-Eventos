@@ -1,0 +1,153 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static dashboard_tags %}
+
+{% block content %}
+{% get_dashboard_stats as stats %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="container-fluid">
+
+  <div class="row">
+
+    <div class="col-lg-4 col-6">
+      <div class="small-box bg-info">
+        <div class="inner">
+          <h3>{{ stats.total_eventos }}</h3>
+          <p>Eventos Cadastrados</p>
+        </div>
+        <div class="icon">
+          <i class="fas fa-calendar-alt"></i>
+        </div>
+        <a href="{% url 'admin:gestaoEventos_evento_changelist' %}" class="small-box-footer">
+          Ver todos <i class="fas fa-arrow-circle-right"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-6">
+      <div class="small-box bg-success">
+        <div class="inner">
+          <h3>{{ stats.total_inscricoes }}</h3>
+          <p>Inscrições Confirmadas</p>
+        </div>
+        <div class="icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <a href="{% url 'admin:gestaoEventos_usereventos_changelist' %}?status__exact=C" class="small-box-footer">
+          Gerenciar <i class="fas fa-arrow-circle-right"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-6">
+      <div class="small-box bg-warning">
+        <div class="inner">
+          <h3>{{ stats.total_usuarios }}</h3>
+          <p>Usuários Totais</p>
+        </div>
+        <div class="icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <a href="{% url 'admin:auth_user_changelist' %}" class="small-box-footer">
+          Ver usuários <i class="fas fa-arrow-circle-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+
+    <div class="col-md-8">
+      <div class="card card-primary card-outline">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i class="fas fa-chart-bar"></i> Top Eventos (Inscritos)
+          </h3>
+        </div>
+        <div class="card-body">
+          <canvas id="inscritosChart"
+            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card card-outline card-danger">
+        <div class="card-header">
+          <h3 class="card-title">Próximos Eventos</h3>
+        </div>
+        <div class="card-body p-0">
+          <ul class="list-group list-group-flush">
+            {% for evento in stats.proximos_eventos %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {{ evento.nome }}
+              <span class="badge badge-primary badge-pill">
+                {{ evento.data_inicio|date:"d/m" }}
+              </span>
+            </li>
+            {% empty %}
+            <li class="list-group-item text-muted">Nenhum evento futuro.</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="card-footer text-center">
+          <a href="{% url 'admin:gestaoEventos_evento_add' %}" class="uppercase">Criar Novo Evento</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Administração do Sistema</h3>
+        </div>
+        <div class="card-body">
+          {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{{ stats.chart_labels|json_script:"dados-nomes" }}
+{{ stats.chart_data|json_script:"dados-valores" }}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // 2. RECUPERAR OS DADOS
+    // O JS busca o conteúdo das tags acima e converte de volta para Array
+    const labels = JSON.parse(document.getElementById('dados-nomes').textContent);
+    const data = JSON.parse(document.getElementById('dados-valores').textContent);
+
+    var ctx = document.getElementById('inscritosChart').getContext('2d');
+    var chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels, // Agora usamos a variável JS limpa
+        datasets: [{
+          label: 'Número de Inscritos',
+          data: data, // Agora usamos a variável JS limpa
+          backgroundColor: 'rgba(60, 141, 188, 0.7)',
+          borderColor: 'rgba(60, 141, 188, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { stepSize: 1 }
+          }
+        }
+      }
+    });
+  });
+</script>
+
+{% endblock %}

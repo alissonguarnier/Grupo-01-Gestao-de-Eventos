@@ -1,0 +1,140 @@
+{% extends 'relatorios/base_pdf.html' %}
+
+{% block content %}
+<style>
+  /* Estilos Gerais de Tabela */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 11px;
+    /* Letra um pouco menor para caber tudo */
+  }
+
+  th {
+    background-color: #f8f9fa;
+    color: #333;
+    font-weight: bold;
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 2px solid #0056b3;
+    /* Azul do sistema */
+  }
+
+  td {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+    color: #444;
+  }
+
+  /* Estilo para zebrar a tabela (facilita leitura) */
+  tr:nth-child(even) {
+    background-color: #fafafa;
+  }
+
+  /* Badges de Status */
+  .badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #fff;
+    text-align: center;
+    min-width: 60px;
+  }
+
+  /* Cores dos Status - Ajuste as letras (C, P) conforme seu Model */
+  .status-c {
+    background-color: #28a745;
+  }
+
+  /* Verde para Confirmado */
+  .status-p {
+    background-color: #ffc107;
+    color: #333;
+  }
+
+  /* Amarelo para Pendente */
+  .status-x {
+    background-color: #6c757d;
+  }
+
+  /* Cinza para Cancelado/Outros */
+
+  /* Destaques de Texto */
+  .txt-primary {
+    color: #0056b3;
+    font-weight: bold;
+  }
+
+  .txt-muted {
+    color: #888;
+    font-size: 10px;
+  }
+</style>
+
+<h1 style="text-align: center; margin-bottom: 10px;">{{ titulo }}</h1>
+<p style="text-align: center; color: #666; font-size: 12px; margin-bottom: 30px;">
+  Gerado em: {% now "d/m/Y H:i" %} | Total de registros: <strong>{{ inscricoes.count }}</strong>
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th width="8%">ID Inscrição</th>
+      <th width="32%">Participante</th>
+      <th width="30%">Evento</th>
+      <th width="15%">Data Inscrição</th>
+      <th width="15%">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for inscricao in inscricoes %}
+    <tr>
+      <td>
+        <span class="txt-primary">#{{ inscricao.id }}</span>
+      </td>
+
+      <td>
+        <strong>{{ inscricao.user.first_name }} {{ inscricao.user.last_name }} - ID:{{ inscricao.user.id }}</strong><br>
+        <span class="txt-muted">{{ inscricao.user.email }}</span>
+      </td>
+
+      <td>
+        {{ inscricao.evento.nome }}
+      </td>
+
+      <td>
+        {{ inscricao.data_inscricao|date:"d/m/Y" }}<br>
+        <span class="txt-muted">{{ inscricao.data_inscricao|date:"H:i" }}</span>
+      </td>
+
+      <td>
+        {% if inscricao.status == 'C' %}
+        <span class="badge status-c">Confirmado</span>
+        {% elif inscricao.status == 'P' %}
+        <span class="badge status-p">Pendente</span>
+        {% else %}
+        <span class="badge status-x">{{ inscricao.get_status_display }}</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="5" style="text-align: center; padding: 20px;">
+        Nenhuma inscrição selecionada para exibição.
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px; text-align: right; font-size: 11px;">
+  <strong>Resumo:</strong>
+  {{ inscricoes.count }} inscrições listadas.
+</div>
+
+{% endblock %}

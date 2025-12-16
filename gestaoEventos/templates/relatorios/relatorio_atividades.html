@@ -1,0 +1,165 @@
+{% extends 'relatorios/base_pdf.html' %}
+
+{% block content %}
+<style>
+  /* Estilos Gerais */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 11px;
+  }
+
+  th {
+    background-color: #0056b3;
+    color: white;
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 2px solid #004494;
+  }
+
+  td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+    color: #444;
+  }
+
+  tr:nth-child(even) {
+    background-color: #fafafa;
+  }
+
+  /* Estilos Específicos */
+  .atv-titulo {
+    font-size: 13px;
+    font-weight: bold;
+    color: #333;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .atv-desc {
+    color: #666;
+    font-size: 10px;
+    font-style: italic;
+    margin-bottom: 5px;
+    display: block;
+  }
+
+  .evento-pai {
+    font-size: 10px;
+    color: #0056b3;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  /* Badges de Tipo */
+  .badge {
+    display: inline-block;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: white;
+    margin-right: 5px;
+  }
+
+  /* Cores baseadas no tipo (Ajuste as letras ao seu Model) */
+  .bg-W {
+    background-color: #6f42c1;
+  }
+
+  /* Workshop - Roxo */
+  .bg-P {
+    background-color: #007bff;
+  }
+
+  /* Palestra - Azul */
+  .bg-O {
+    background-color: #fd7e14;
+  }
+
+  /* Oficina - Laranja */
+  .bg-X {
+    background-color: #6c757d;
+  }
+
+  /* Outros - Cinza */
+
+  .responsavel-nome {
+    font-weight: bold;
+    color: #333;
+  }
+</style>
+
+<h1 style="text-align: center; margin-bottom: 5px;">{{ titulo }}</h1>
+<div style="text-align: right; font-size: 10px; color: #666; margin-bottom: 25px;">
+  Gerado em: {% now "d/m/Y H:i" %} | Total: <strong>{{ atividades.count }}</strong>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th width="45%">Atividade / Descrição</th>
+      <th width="30%">Agenda e Contexto</th>
+      <th width="25%">Responsável</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for atv in atividades %}
+    <tr>
+      <td>
+        <span class="badge bg-{{ atv.tipo }}">{{ atv.get_tipo_display }}</span>
+
+        <span class="atv-titulo">{{ atv.titulo }}</span>
+
+        <span class="atv-desc">
+          {{ atv.descricao|default:"Sem descrição definida."|truncatewords:20 }}
+        </span>
+      </td>
+
+      <td>
+        <div style="margin-bottom: 6px;">
+          <span style="color: #999; font-size: 9px;">EVENTO:</span><br>
+          <span class="evento-pai">{{ atv.evento.nome }}</span>
+        </div>
+
+        <div>
+          <strong>{{ atv.horario_inicio|date:"d/m/Y" }}</strong><br>
+          {{ atv.horario_inicio|date:"H:i" }} às {{ atv.horario_fim|date:"H:i" }}
+        </div>
+      </td>
+
+      <td>
+        {% if atv.responsavel %}
+        <span style="color: #0056b3; font-weight: bold; font-size: 10px;">#{{ atv.responsavel.id }}</span>
+        <br>
+        <span class="responsavel-nome">
+          {{ atv.responsavel.first_name }} {{ atv.responsavel.last_name }}
+        </span>
+        <br>
+        <small style="color: #777;">{{ atv.responsavel.email }}</small>
+        {% else %}
+        <span style="color: #999; font-style: italic;">Não atribuído</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="3" style="text-align: center; padding: 20px; color: #999;">
+        Nenhuma atividade encontrada para os critérios selecionados.
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px;">
+  <strong style="font-size: 10px;">Legenda de Tipos:</strong>
+  <span class="badge bg-W" style="font-size: 8px;">Workshop</span>
+  <span class="badge bg-P" style="font-size: 8px;">Palestra</span>
+  <span class="badge bg-O" style="font-size: 8px;">Oficina</span>
+</div>
+
+{% endblock %}

@@ -16,7 +16,7 @@
 
 ## Orientador
 
-Diego Martins
+[Diego Martins](https://github.com/diegomo2)
 
 ---
 
@@ -44,7 +44,9 @@ Funcionalidades principais:
 
 - **CRUD Completo:** Gestão de Eventos e Atividades.
 - **Inscrições:** Vínculo de participantes em eventos (N:N).
-- **Dashboard:** Rota consolidada com dados do evento, atividades e inscritos.
+- **Dashboard API:** Rota consolidada com dados do evento, atividades e inscritos.
+- **Dashboard Administrativo:** Painel visual com gráficos, métricas em tempo real e atalhos rápidos no Django Admin.
+- **Certificados em PDF:** Geração automática de certificados de participação com layout profissional e cálculo dinâmico de carga horária.
 - **Carga de Dados:** Script automatizado para importação de dados via CSV.
 - **Documentação:** Interface interativa com Swagger e ReDoc via spetacular.
 
@@ -52,14 +54,16 @@ Funcionalidades principais:
 
 ## Pacotes Utilizados
 
-| Pacote                   | Versão | Descrição              |
-| ------------------------ | ------ | ---------------------- |
-| Django                   | ≥5.0   | Framework principal    |
-| django-filter            | latest | Função filter do django|
-| djangorestframework      | latest | API REST               |
-| drf-spectacular          | latest | Documentação OpenAPI   |
-| drf-spectacular-sidecar  | latest | UI Swagger/ReDoc       |
-| django-cors-headers      | latest | Segurança do HTML      |
+| Pacote                  | Versão | Descrição               |
+| ----------------------- | ------ | ----------------------- |
+| Django                  | ≥5.0   | Framework principal     |
+| django-filter           | latest | Função filter do django |
+| djangorestframework     | latest | API REST                |
+| drf-spectacular         | latest | Documentação OpenAPI    |
+| drf-spectacular-sidecar | latest | UI Swagger/ReDoc        |
+| django-cors-headers     | latest | Segurança do HTML       |
+| django-jazzmin          | latest | Tema do Admin           |
+| xhtml2pdf               | latest | Geração de PDFs         |
 
 > **Nota:** Consulte o arquivo `requirements.txt` para a lista completa e versões exatas.
 
@@ -72,28 +76,36 @@ GRUPO-01-GESTAO-DE-EVENTOS/
 ├── manage.py
 ├── requirements.txt
 ├── README.md
+├── data/
+│   ├── atividades.csv
+│   ├── eventos.csv
+│   └── ...
 ├── frontend/
-│   └── index.html
+│   └── index.html #painel de visualização para participantes
 ├── projeto/
 │   ├── settings.py
 │   ├── urls.py
-│   ├── wsgi.py
 │   └── ...
 ├── gestaoEventos/
-│   ├── management/
-│   │   ├── commands/
-│   │   │   ├── importar_dados
-│   │   │   ├── ...
-│   │   └── ...
-│   ├── migrations/
-│   │   ├── initial.py
-│   │   ├── alter_usereventos_options.py
-│   │   └── ...
 │   ├── admin.py
 │   ├── models.py
 │   ├── serializers.py
 │   ├── views.py
-│   └── ...
+│   ├── utils.py                 # Lógica de geração de PDF
+│   ├── management/
+│   │   └── commands/
+│   │       └── importar_dados.py
+│   ├── templatetags/            # Tags customizadas para o Dashboard
+│   │   └── dashboard_tags.py
+│   └── templates/
+│       ├── admin/               # Customização do Jazzmin/Dashboard
+│       │   ├── index.html
+│       │   └── app_list.html
+│       └── relatorios/          # Templates dos Certificados
+│           ├── base_pdf.html
+│           ├── certificado.html
+│           ├── relatorios_atividades.html
+│           └── ...
 └── docs/
     ├── codigos_diagramas/
     │   ├── DER_banco.pu
@@ -106,12 +118,13 @@ GRUPO-01-GESTAO-DE-EVENTOS/
 ```
 
 - **projeto/** → configurações principais do Django.
-- **gestaoEventos/** → aplicação principal com modelos, views, serializers e rotas.
+- **gestaoEventos/** → aplicação principal com modelos, views, lógica de relatórios, customizações do admin, serializers e rotas.
 - **docs/** → documentação auxiliar (diagramas, imagens).
 
 ---
 
 ## Diagrama de Banco de Dados
+
 DER:
 
 ![DER_banco](docs/03-DER_Banco.png)
@@ -164,13 +177,12 @@ MER:
 
 ### **UserEvento "Inscrição" (D)**
 
-| Campo        | Tipo       | Descrição                               |
-| ------------ | ---------- | --------------------------------------- |
-| id           | PK         | Identificador                           |
-| user_id      | FK         | Relacionamento com user (participante)  |
-| evento_id    | Fk         | Relacionamento com evento               |
-|data_inscricao| CharField  | Telefone                                |
-
+| Campo          | Tipo      | Descrição                              |
+| -------------- | --------- | -------------------------------------- |
+| id             | PK        | Identificador                          |
+| user_id        | FK        | Relacionamento com user (participante) |
+| evento_id      | Fk        | Relacionamento com evento              |
+| data_inscricao | CharField | Telefone                               |
 
 ---
 
@@ -196,7 +208,7 @@ MER:
 
 - **Evento** → agrupa vários eventos.
 - **Atividade** → pertence a um evento, tem um responsável.
-- **User** → pode estar em vários eventos e liderar uma atividade.
+- **User** → pode estar em vários eventos.
 
 Relacionamentos:
 
@@ -217,15 +229,14 @@ A documentação interativa está disponível em:
 
 ### Endpoints Principais
 
-
-| Método | Endpoint                            | Descrição                           | Auth        |
-| ------ | ----------------------------------- | ---------------------------------   | ----------- |
-| GET    | `/api/eventos/`                     | Lista todos os eventos e atividades | Opcional    |
-| GET    | `/api/eventos/{id}/dashboard/`      | Detalhes completos com as inscrições| Opcional    |
-| GET    | `/api/atividades/`                  | Lista atividades                    | Opcional    |
-| GET    | `/api/atividades/{id}/`             | Detalhes da atividade               | Opcional    |
-| GET    | `/api/participantes/{id}/`          | Detalhes do participante            | Opcional    |
-| GET    | `/api/eventos/{id}/participantes/`  | Lista de inscritos no evento        | Opcional    |
+| Método | Endpoint                           | Descrição                            | Auth     |
+| ------ | ---------------------------------- | ------------------------------------ | -------- |
+| GET    | `/api/eventos/`                    | Lista todos os eventos e atividades  | Opcional |
+| GET    | `/api/eventos/{id}/dashboard/`     | Detalhes completos com as inscrições | Opcional |
+| GET    | `/api/atividades/`                 | Lista atividades                     | Opcional |
+| GET    | `/api/atividades/{id}/`            | Detalhes da atividade                | Opcional |
+| GET    | `/api/participantes/{id}/`         | Detalhes do participante             | Opcional |
+| GET    | `/api/eventos/{id}/participantes/` | Lista de inscritos no evento         | Opcional |
 
 ## Configuração do Ambiente
 
@@ -236,58 +247,69 @@ A documentação interativa está disponível em:
       cd Grupo-01-Gestao-de-Eventos
    ```
 
-1. **Crie um ambiente virtual:**
+2. **Crie um ambiente virtual:**
 
    ```bash
-      python -m venv venv
-      source venv/bin/activate  # Linux/Mac
-      venv\Scripts\activate     # Windows
+      python -m venv .venv
+      source .venv/bin/activate  # Linux/Mac
+      .venv\Scripts\activate     # Windows
    ```
 
-2. **Instale as dependências:**
+3. **Instale as dependências:**
 
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Aplique as migrações do banco:**
+4. **Aplique as migrações do banco:**
 
    ```bash
-   # python manage.py makemigrations (usa ou não?)
-   python manage.py migrate 
+   python manage.py migrate
    ```
 
-4. **Populando o banco de dados:**
+5. **Populando o banco de dados:**
 
    ```bash
    python manage.py importar_dados
    ```
 
-5. **Criando o Super User:**
+6. **Criando o Super User:**
 
    ```bash
       python manage.py createsuperuser
-   ```  
+   ```
 
-6. **Iniciando o server:**
+7. **Iniciando o server:**
 
    ```bash
       python manage.py runserver
-   ```  
+   ```
 
-## Front-End 
+## Front-End
 
-### Abrindo e utilizando o front end:
+### Abrindo e utilizando o front end (visualização para participantes):
 
 1. **instale a extenção [Live server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) no Visual Studio**;
 
 2. **Localize o arquivo index.html no caminho abaixo;**
-      ```bash
-      GRUPO-01-GESTAO-DE-EVENTOS/
-      └── frontend/
-          └── index.html
-      ```
+
+   ```bash
+   GRUPO-01-GESTAO-DE-EVENTOS/
+   └── frontend/
+       └── index.html
+   ```
 
 3. **Abra o arquivo com o "Open with Live Server";**
 
 4. **Faça o login com o Super User criado.**
+
+<br>
+
+# Equipe de Desenvolvimento
+
+| Nome               | GitHub                                                |
+| ------------------ | ----------------------------------------------------- |
+| Alisson Guarniêr   | [alissonguarnier](https://github.com/alissonguarnier) |
+| Alicia Neves Sousa | [AliciaN02](https://github.com/AliciaN02)             |
+| Jonathan Carneiro  | [Jhon87](https://github.com/Jhon87)                   |
+| Thaylan            | [ThaylanMora](https://github.com/ThaylanMora)         |

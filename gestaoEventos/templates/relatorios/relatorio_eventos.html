@@ -1,0 +1,178 @@
+{% extends 'relatorios/base_pdf.html' %}
+
+{% block content %}
+<style>
+  /* Estilos específicos deste relatório */
+  .evento-container {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #fff;
+  }
+
+  .evento-header {
+    border-bottom: 2px solid #0056b3;
+    /* Cor azul institucional */
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+  }
+
+  .evento-titulo {
+    font-size: 18px;
+    color: #0056b3;
+    margin: 0;
+  }
+
+  .evento-meta {
+    color: #666;
+    font-size: 11px;
+    margin-top: 5px;
+  }
+
+  /* Tabelas */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+  }
+
+  th {
+    background-color: #f2f2f2;
+    color: #333;
+    font-weight: bold;
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+  }
+
+  td {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    color: #444;
+  }
+
+  /* Lista de Participantes */
+  .participantes-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .participante-item {
+    /* Garante que cada participante ocupe a linha toda (evita bagunça) */
+    display: block;
+    border-bottom: 1px solid #eee;
+    /* Linha divisória suave */
+    padding: 8px 0;
+    /* Espaço para respirar */
+  }
+
+  .participante-item:last-child {
+    border-bottom: none;
+  }
+
+  .nome-participante {
+    display: block;
+    /* Força o nome a ficar em uma linha */
+    font-weight: bold;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 2px;
+    /* Espacinho entre nome e email */
+  }
+
+  .email-participante {
+    display: block;
+    /* Força o email a ficar na linha de baixo */
+    font-size: 11px;
+    color: #666;
+  }
+
+  h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 14px;
+    border-left: 4px solid #0056b3;
+    padding-left: 8px;
+  }
+
+  .badge-count {
+    background-color: #eee;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+  }
+
+  .page-break {
+    page-break-after: always;
+  }
+</style>
+
+<h1 style="text-align: center; margin-bottom: 30px;">Relatório de Eventos</h1>
+
+{% for evento in eventos %}
+<div class="evento-container">
+
+  <div class="evento-header">
+    <h3 class="evento-titulo">{{ evento.nome }}</h3>
+    <div class="evento-meta">
+      <strong>Data:</strong> {{ evento.data_inicio|date:"d/m/Y H:i" }} até {{ evento.data_fim|date:"d/m/Y H:i" }} <br>
+      <strong>Local:</strong> {{ evento.local }}
+    </div>
+  </div>
+
+  <h4>Atividades do Evento</h4>
+  <table class="sub-table">
+    <thead>
+      <tr>
+        <th width="40%">Título</th>
+        <th width="20%">Horário</th>
+        <th width="40%">Responsável</th>
+        <th width="20%">ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for atv in evento.atividades.all %}
+      <tr>
+        <td>{{ atv.titulo }}</td>
+        <td>{{ atv.horario_inicio|date:"H:i" }}</td>
+        <td>{{ atv.responsavel.first_name }}</td>
+        <td><span style="color: #0056b3; margin-right: 3px;">{{ atv.responsavel.id }}</span></td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="3" style="text-align: center; color: #999;">Nenhuma atividade cadastrada.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h4>
+    Participantes Inscritos
+    <span class="badge-count">{{ evento.usereventos_set.count }}</span>
+  </h4>
+
+  {% if evento.usereventos_set.exists %}
+  <ul class="participantes-lista">
+    {% for inscricao in evento.usereventos_set.all %}
+    <li>
+      <span style="color: #0056b3; margin-right: 5px;">ID: {{ inscricao.user.id }}</span>
+      <strong>{{ inscricao.user.first_name }} {{ inscricao.user.last_name }}</strong> <br>
+      <small>{{ inscricao.user.email }}</small>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p style="color: #999; font-style: italic;">Nenhum inscrito neste evento.</p>
+  {% endif %}
+
+</div>
+
+{% if not forloop.last %}
+<div class="page-break"></div>
+{% endif %}
+
+{% endfor %}
+
+{% endblock %}

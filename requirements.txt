@@ -5,3 +5,4 @@ drf-spectacular # Documentação
 drf-spectacular-sidecar # Documentação
 django-cors-headers # Para liberar o uso do frontend
 django-jazzmin # tema
+xhtml2pdf #gerar relatorio pdf

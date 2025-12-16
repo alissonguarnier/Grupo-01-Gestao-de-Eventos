@@ -1,10 +1,14 @@
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
+# para gerar o pdf:
+from .utils import render_to_pdf
+from django.contrib.auth.decorators import user_passes_test
+from django.db.models import Prefetch
 
-# Importe seus models e serializers
+# Importando models e serializers
 from .models import Evento, Atividade, UserEventos, Perfil
 from .serializers import (
     UserSerializer, 
@@ -107,3 +111,96 @@ class AtividadeViewSet(viewsets.ModelViewSet):
         atividade.save()
         
         return Response({"mensagem": f"Responsável definido: {user.username}"})
+    
+
+# ------------------ Funções para criar o pdf ----------------
+
+# Função auxiliar para verificar se é staff
+
+# No início do arquivo views.py
+
+def is_staff_check(user):
+    # 1. Se não estiver logado, barra direto
+    if not user.is_authenticated:
+        return False
+        
+    # 2. Se for Superusuário (admin geral), LIBERA GERAL
+    if user.is_superuser:
+        return True
+
+    # 3. Se for usuário comum, verifica se tem perfil e se é do tipo Staff ('O')
+    if hasattr(user, 'perfil') and user.perfil.is_grupo_staff:
+        return True
+        
+    return False
+
+# Desativei para usar o SuperUser
+'''def is_staff_check(user):
+    return user.is_authenticated and hasattr(user, 'perfil') and user.perfil.is_grupo_staff'''
+
+# 1. Relatório de Eventos
+@user_passes_test(is_staff_check)
+def relatorio_eventos(request):
+    '''eventos = Evento.objects.all().order_by('data_inicio').prefetch_related(
+        'atividade_set', 
+        'usereventos_set__user'
+    )'''
+    eventos = Evento.objects.all().order_by('data_inicio')
+
+
+    context = {'eventos': eventos, 'titulo': 'Relatório Geral de Eventos'}
+    return render_to_pdf('relatorios/relatorio_eventos.html', context)
+
+# 2. Relatório de Atividades
+@user_passes_test(is_staff_check)
+def relatorio_atividades(request):
+    # Busca todas as atividades, já trazendo os dados relacionados para ser rápido
+    atividades = Atividade.objects.all().select_related('evento', 'responsavel').order_by('horario_inicio')
+    
+    context = {
+        'atividades': atividades, 
+        'titulo': 'Relatório Geral de Atividades'
+    }
+    
+    return render_to_pdf('relatorios/relatorio_atividades.html', context)
+
+# 3. Relatório de Participantes
+@user_passes_test(is_staff_check)
+def relatorio_participantes(request):
+    # Pega usuários que são participantes (P)
+    # Prefetch para otimizar a busca das inscrições (usereventos) e responsabilidades (atividade_set)
+    participantes = User.objects.filter(perfil__tipo='P').order_by('first_name').prefetch_related(
+        'usereventos_set__evento'
+    )
+
+    context = {'participantes': participantes, 'titulo': 'Relatório de Participantes'}
+    return render_to_pdf('relatorios/relatorio_participantes.html', context)
+
+# 4. Relatório de Inscrições
+@user_passes_test(is_staff_check)
+def relatorio_inscricoes(request):
+    inscricoes = UserEventos.objects.all().select_related('user', 'evento').order_by('-data_inscricao')
+
+    context = {
+        'inscricoes': inscricoes,
+        'titulo': 'Relatório Geral de Inscrições'
+    }
+
+    # Reutiliza o mesmo HTML que criamos para a Action do Admin
+    return render_to_pdf('relatorios/relatorio_inscricoes.html', context)
+
+@user_passes_test(is_staff_check)
+def relatorio_grupos_geral(request):
+    # Busca TODOS os grupos com a otimização de consulta
+    grupos = Group.objects.all().prefetch_related(
+        'user_set',                           
+        'user_set__usereventos_set__evento',  
+        'user_set__atividades_responsavel'
+    )
+    
+    context = {
+        'grupos': grupos, 
+        'titulo': 'Relatório Geral de Grupos'
+    }
+    # Reutiliza o mesmo HTML bonito que já criamos
+    return render_to_pdf('relatorios/relatorio_grupos.html', context)

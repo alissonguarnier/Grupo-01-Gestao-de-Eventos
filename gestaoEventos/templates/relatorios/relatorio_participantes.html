@@ -1,0 +1,133 @@
+{% extends 'relatorios/base_pdf.html' %}
+
+{% block content %}
+<style>
+  /* Estilos globais iguais ao de Grupos */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+    font-size: 11px;
+    margin-top: 10px;
+  }
+
+  th {
+    background-color: #0056b3;
+    /* Cabeçalho Azul */
+    color: white;
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #004494;
+  }
+
+  td {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+    color: #444;
+  }
+
+  /* Listas internas */
+  .lista-interna {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .lista-interna li {
+    margin-bottom: 3px;
+    line-height: 1.3;
+  }
+
+  /* Badge de Perfil (Opcional, se tiver Perfil) */
+  .badge-perfil {
+    font-size: 9px;
+    background-color: #eee;
+    padding: 2px 5px;
+    border-radius: 4px;
+    color: #555;
+    text-transform: uppercase;
+  }
+</style>
+
+<h1 style="text-align: center; margin-bottom: 5px;">{{ titulo }}</h1>
+<div style="text-align: right; font-size: 10px; color: #666; margin-bottom: 20px;">
+  Gerado em: {% now "d/m/Y H:i" %} | Total: <strong>{{ participantes.count }}</strong>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th width="35%">Usuário / Perfil</th>
+      <th width="25%">Contato</th>
+      <th width="40%">Envolvimento</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in participantes %}
+    <tr>
+      <td>
+        <span style="color: #0056b3; font-weight: bold;">#{{ user.id }}</span>
+        <strong style="font-size: 13px;">{{ user.first_name }} {{ user.last_name }}</strong>
+        <br>
+
+        {% if user.perfil %}
+        <span class="badge-perfil" style="margin-top: 5px; display: inline-block;">
+          {{ user.perfil.get_tipo_display|default:"Sem Perfil" }}
+        </span>
+        {% if user.is_staff %}
+        <span class="badge-perfil" style="background-color: #d1e7dd; color: #0f5132;">Staff</span>
+        {% endif %}
+        {% else %}
+        <small style="color: #999;">(Sem perfil extra)</small>
+        {% endif %}
+      </td>
+
+      <td>
+        {{ user.email }}
+      </td>
+
+      <td>
+        {% if user.atividades_responsavel.exists %}
+        <div style="margin-bottom: 10px;">
+          <strong style="color: #d63384; font-size: 10px;">RESPONSÁVEL POR:</strong>
+          <ul class="lista-interna">
+            {% for atv in user.atividades_responsavel.all %}
+            <li>
+              {{ atv.titulo }}
+              <span style="color: #666; font-size: 10px;">({{ atv.evento.nome }})</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        {% if user.usereventos_set.exists %}
+        <div>
+          <strong style="color: #28a745; font-size: 10px;">INSCRITO EM:</strong>
+          <ul class="lista-interna">
+            {% for inscricao in user.usereventos_set.all %}
+            <li>
+              {{ inscricao.evento.nome }}
+              <small style="color: #666;">({{ inscricao.get_status_display }})</small>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        {% if not user.atividades_responsavel.exists and not user.usereventos_set.exists %}
+        <span style="color: #ccc; font-style: italic;">Sem atividades recentes.</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div
+  style="margin-top: 30px; border-top: 1px solid #ccc; padding-top: 10px; text-align: center; font-size: 10px; color: #999;">
+  Fim do Relatório
+</div>
+
+{% endblock %}

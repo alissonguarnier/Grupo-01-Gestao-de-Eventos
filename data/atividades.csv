@@ -1,3 +1,43 @@
 Palestra de Abertura,Visão geral do mercado de TI,2025-11-10 09:00,2025-11-10 10:30,P,Semana da Tecnologia,dr.paulo
 Oficina de API,Criando rotas com DRF,2025-11-12 14:00,2025-11-12 16:00,O,Workshop Django,professor
 Pitch de Startups,Apresentação de projetos,2025-12-02 18:00,2025-12-02 20:00,X,Hackathon IFB,joao.silva
+Keynote: O Futuro da Tecnologia,Abertura oficial com tendências de mercado,2025-11-10 09:00,2025-11-10 11:00,P,Semana da Tecnologia,dr.paulo
+Painel: Segurança da Informação,Debate sobre proteção de dados,2025-11-11 14:00,2025-11-11 16:00,P,Semana da Tecnologia,eng.marcos
+Introdução ao Django Rest Framework,Configuração inicial e serializers,2025-11-12 14:00,2025-11-12 16:00,O,Workshop Django,professor
+Autenticação com JWT,Segurança em APIs REST,2025-11-12 16:15,2025-11-12 18:00,O,Workshop Django,dev.lucas
+Brainstorming de Ideias,Definição de escopo dos projetos,2025-12-01 08:00,2025-12-01 10:00,O,Hackathon IFB,coord.ana
+Mentoria Técnica: Backend,Apoio aos times de desenvolvimento,2025-12-01 14:00,2025-12-01 18:00,X,Hackathon IFB,tec.carlos
+Pitch Final e Premiação,Apresentação dos MVPs para banca,2025-12-02 18:00,2025-12-02 20:00,X,Hackathon IFB,dir.fernanda
+Redes Neurais para Iniciantes,Conceitos básicos e aplicações,2025-11-15 19:00,2025-11-15 20:30,P,Inteligência Artificial na Prática,phd.elena
+Ética na IA,Discussão sobre viés algorítmico,2025-11-15 20:45,2025-11-15 22:00,P,Inteligência Artificial na Prática,prof.roberto
+Montagem de Circuitos,Primeiros passos com eletrônica,2025-11-18 14:00,2025-11-18 15:30,O,Oficina de Robótica com Arduino,tec.carlos
+Programação em C++,Codificando o Arduino,2025-11-18 15:45,2025-11-18 17:00,O,Oficina de Robótica com Arduino,eng.marcos
+LGPD na Prática,Como adequar sistemas à lei,2025-11-20 08:00,2025-11-20 10:00,P,Seminário de Cibersegurança,adv.bruno
+Ataques e Defesas,Simulação de pentest básico,2025-11-20 10:15,2025-11-20 12:00,O,Seminário de Cibersegurança,eng.marcos
+Comandos Básicos do Git,Init add commit e push,2025-11-22 09:00,2025-11-22 11:00,O,Curso de Git e GitHub,dev.lucas
+Trabalhando em Equipe,Pull requests e resolução de conflitos,2025-11-22 11:15,2025-11-22 13:00,O,Curso de Git e GitHub,coord.ana
+Revisão de Currículos,Dicas para melhorar seu CV,2025-11-25 10:00,2025-11-25 12:00,X,Feira de Estágios 2025,sec.julia
+Simulação de Entrevistas,Dinâmica de grupo prática,2025-11-25 14:00,2025-11-25 16:00,X,Feira de Estágios 2025,cons.bruno
+Design Thinking,Processo criativo para interfaces,2025-11-28 14:00,2025-11-28 16:00,O,Workshop de UX/UI Design,arq.sofia
+Prototipagem no Figma,Criando telas interativas,2025-11-28 16:15,2025-11-28 18:00,O,Workshop de UX/UI Design,arq.sofia
+Desenvolvimento Rápido na Unity,Criando mecânicas básicas,2025-12-06 10:00,2025-12-06 13:00,O,Maratona de Games,dev.lucas
+Mulheres na Liderança Tech,Histórias inspiradoras,2025-12-10 19:00,2025-12-10 21:00,P,Palestra: Mulheres na TI,dir.fernanda
+Tabelas Dinâmicas e Gráficos,Visualização de dados no Excel,2025-12-12 08:00,2025-12-12 10:00,O,Curso de Excel Avançado,sec.julia
+Coquetel de Networking,Troca de experiências profissionais,2025-12-15 19:00,2025-12-15 22:00,X,Encontro de Egressos,coord.ana
+Terminal Linux e Bash,Navegação e manipulação de arquivos,2026-01-10 14:00,2026-01-10 16:00,O,Introdução ao Linux,tec.carlos
+Permissões e Processos,Gerenciamento do sistema operacional,2026-01-10 16:15,2026-01-10 18:00,O,Introdução ao Linux,prof.roberto
+HTML5 e CSS3 Moderno,Estrutura e estilo para web,2026-01-15 08:00,2026-01-15 12:00,O,Bootcamp Fullstack,dev.lucas
+JavaScript ES6+,Funcionalidades modernas da linguagem,2026-01-16 08:00,2026-01-16 12:00,O,Bootcamp Fullstack,professor
+Scrum Framework,Papéis e artefatos,2026-02-05 09:00,2026-02-05 11:00,O,Workshop Metodologias Ágeis,cons.bruno
+Kanban na Prática,Gestão visual de fluxo,2026-02-05 11:15,2026-02-05 13:00,O,Workshop Metodologias Ágeis,coord.ana
+Arquitetura AWS,Serviços principais da Amazon,2026-02-10 19:00,2026-02-10 20:00,P,Palestra: Computação em Nuvem,eng.marcos
+Comparativo Azure vs AWS,Qual escolher para seu projeto?,2026-02-10 20:00,2026-02-10 21:00,P,Palestra: Computação em Nuvem,dev.lucas
+Storytelling para Negócios,Como contar a história da sua startup,2026-02-15 14:00,2026-02-15 15:30,O,Oficina de Pitch,cons.bruno
+Design de Slides Impactantes,Visual para apresentações,2026-02-15 15:45,2026-02-15 17:00,O,Oficina de Pitch,arq.sofia
+Final League of Legends,Transmissão e comentários,2026-02-20 10:00,2026-02-20 15:00,X,Torneio de E-Sports,tec.carlos
+Final Valorant,Partida decisiva,2026-02-21 15:00,2026-02-21 20:00,X,Torneio de E-Sports,tec.carlos
+Pandas Dataframes,Manipulação de dados tabulares,2026-03-01 08:00,2026-03-01 12:00,O,Curso de Python para Dados,phd.elena
+Visualização com Matplotlib,Criando gráficos científicos,2026-03-02 08:00,2026-03-02 12:00,O,Curso de Python para Dados,phd.elena
+Marketing Digital para Startups,Estratégias de crescimento,2026-03-10 09:00,2026-03-10 11:00,P,Semana do Empreendedorismo,cons.bruno
+Configuração do Ambiente React Native,Expo e Android Studio,2026-03-20 14:00,2026-03-20 16:00,O,Workshop de React Native,dev.lucas
+Tecnologia e Meio Ambiente,Green IT e suas aplicações,2026-03-25 09:00,2026-03-25 11:00,P,Fórum de Sustentabilidade,prof.roberto

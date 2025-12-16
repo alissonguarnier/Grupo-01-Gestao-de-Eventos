@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'gestaoEventos',
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -43,8 +44,6 @@ INSTALLED_APPS = [
     'django_filters',
     'corsheaders',
     'drf_spectacular',
-    'gestaoEventos',
-
 ]
 
 MIDDLEWARE = [
@@ -230,7 +229,7 @@ JAZZMIN_UI_TWEAKS = {
     "navbar_fixed": True,
     "layout_boxed": False,
     "footer_fixed": False,
-    "sidebar_fixed": False,
+    "sidebar_fixed": True,
     "sidebar": "sidebar-dark-info",
     "sidebar_nav_small_text": False,
     "sidebar_disable_expand": False,
@@ -250,3 +249,5 @@ JAZZMIN_UI_TWEAKS = {
     },
     "actions_sticky_top": False
 }
+
+LOGIN_URL = '/admin/login/'
