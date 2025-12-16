@@ -303,6 +303,18 @@ A documentação interativa está disponível em:
 
 4. **Faça o login com o Super User criado.**
 
+## Emitindo relatórios e certificados
+
+### Para emitir relatorios e os certificados, abra o painel de admin com um úsuario que tenha permissão:
+
+1. **Vá até uma página que queira emitir o relatório;**
+
+2. **Para emitir um relatório de todos da página, clique em "Relatório PDF Geral";**
+
+3. **Para emitir um relatório de apenas os selecionados, marque os desejados e no menu de ação, selecione "gerar pdf dos selecionados" e depois no botão "Ir";**
+
+4. **Para emitir os certificados, vá na página de inscrições, selecione os participantes desejados (que esteja com status confirmado) e vá no menu de ações e selecione "Gerar Certificados" e clique em "Ir".**
+
 <br>
 
 # Equipe de Desenvolvimento
